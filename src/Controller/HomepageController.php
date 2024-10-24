@@ -21,5 +21,5 @@ class HomepageController extends AbstractController
     public function backHome()
     {
         return $this->redirectToRoute('homepage');
-    }
+    } 
 }
