@@ -1,0 +1,23 @@
+@startuml Add device
+
+actor Customer
+participant Device
+participant "Device manager" as DeviceManager
+
+activate Customer
+activate DeviceManager
+
+Customer -> Device : Create
+activate Device
+Device -> DeviceManager : register
+
+deactivate Customer
+deactivate Device
+deactivate DeviceManager
+
+note right of DeviceManager
+    Should the device be added to the database here?
+    Or will the device be added automatically on the next message sent?
+end note
+
+@enduml

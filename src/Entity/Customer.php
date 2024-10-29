@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\CustomerRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -48,6 +50,23 @@ class Customer
 
     #[ORM\Column(length: 50)]
     private ?string $bank_details = null;
+
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $address = null;
+
+    #[ORM\Column(length: 80, nullable: true)]
+    private ?string $city = null;
+
+    /**
+     * @var Collection<int, Price>
+     */
+    #[ORM\OneToMany(targetEntity: Price::class, mappedBy: 'customer', orphanRemoval: true)]
+    private Collection $prices;
+
+    public function __construct()
+    {
+        $this->prices = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -182,6 +201,60 @@ class Customer
     public function setBankDetails(string $bank_details): static
     {
         $this->bank_details = $bank_details;
+
+        return $this;
+    }
+
+    public function getAddress(): ?string
+    {
+        return $this->address;
+    }
+
+    public function setAddress(?string $address): static
+    {
+        $this->address = $address;
+
+        return $this;
+    }
+
+    public function getCity(): ?string
+    {
+        return $this->city;
+    }
+
+    public function setCity(?string $city): static
+    {
+        $this->city = $city;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Price>
+     */
+    public function getPrices(): Collection
+    {
+        return $this->prices;
+    }
+
+    public function addPrice(Price $price): static
+    {
+        if (!$this->prices->contains($price)) {
+            $this->prices->add($price);
+            $price->setCustomer($this);
+        }
+
+        return $this;
+    }
+
+    public function removePrice(Price $price): static
+    {
+        if ($this->prices->removeElement($price)) {
+            // set the owning side to null (unless already changed)
+            if ($price->getCustomer() === $this) {
+                $price->setCustomer(null);
+            }
+        }
 
         return $this;
     }

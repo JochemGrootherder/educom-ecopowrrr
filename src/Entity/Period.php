@@ -34,10 +34,17 @@ class Period
     #[ORM\OneToMany(targetEntity: DeviceSurplus::class, mappedBy: 'period')]
     private Collection $deviceSurpluses;
 
+    /**
+     * @var Collection<int, Price>
+     */
+    #[ORM\ManyToMany(targetEntity: Price::class, mappedBy: 'period')]
+    private Collection $prices;
+
     public function __construct()
     {
         $this->deviceYields = new ArrayCollection();
         $this->deviceSurpluses = new ArrayCollection();
+        $this->prices = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -124,6 +131,33 @@ class Period
             if ($deviceSurplus->getPeriod() === $this) {
                 $deviceSurplus->setPeriod(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Price>
+     */
+    public function getPrices(): Collection
+    {
+        return $this->prices;
+    }
+
+    public function addPrice(Price $price): static
+    {
+        if (!$this->prices->contains($price)) {
+            $this->prices->add($price);
+            $price->addPeriod($this);
+        }
+
+        return $this;
+    }
+
+    public function removePrice(Price $price): static
+    {
+        if ($this->prices->removeElement($price)) {
+            $price->removePeriod($this);
         }
 
         return $this;

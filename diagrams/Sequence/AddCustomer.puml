@@ -1,0 +1,23 @@
+@startuml Add customer
+actor Advisor
+participant "Mobile app" as mobileApp
+participant "Customer controller" as CustomerController
+participant "Customer repository" as CustomerRepository
+participant "Postcode.tech" as PostcodeTech
+participant "DeviceManagerRepository" as DeviceManagerRepository
+participant "Device Manager Mock" as DeviceManagerMock
+Database Database
+
+Advisor -> mobileApp : add customer
+mobileApp -> CustomerController : add customer
+CustomerController -> CustomerRepository : add customer
+CustomerRepository -> CustomerRepository : check if exists
+opt customerExists == false
+    CustomerRepository -> PostcodeTech : request postcode
+    CustomerRepository -> Database : Create customer
+    CustomerRepository -> DeviceManagerRepository : Create
+    DeviceManagerRepository -> Database : create device manager
+    DeviceManagerRepository -> DeviceManagerMock : Initial message
+end
+
+@enduml

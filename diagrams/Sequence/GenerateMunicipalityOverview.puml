@@ -1,0 +1,50 @@
+@startuml Generate municipality overview
+
+actor Advisor
+hide unlinked
+participant "Advisor controller" as AdvisorController
+participant "Customer repository" as CustomerRepository
+
+activate Advisor
+activate AdvisorController
+activate CustomerRepository
+activate Customer
+activate DeviceManager
+activate Device
+activate surplus
+
+Advisor -> AdvisorController : GenerateOverview(Municipality)
+AdvisorController -> CustomerRepository : SelectCustomersByZipcodes([zipcodes])
+loop foreach zipcode in zipcodes
+    CustomerRepository -> CustomerRepository : customers+=GetCustomersByZipcode(zipcode)
+end loop
+CustomerRepository --> AdvisorController : customers
+loop foreach customer in customers
+    AdvisorController -> Customer : getPrices()
+    AdvisorController -> Customer : getDeviceManager()
+    AdvisorController -> DeviceManager : getDevices()
+    loop foreach Device
+        AdvisorController -> Device : getDeviceYields()
+        AdvisorController -> Device : getDeviceSurpluses()
+    end loop
+    loop foreach yield in yields
+        AdvisorController -> AdvisorController : totalYield += yield.getAmount()
+    end loop
+    loop foreach surplus in surpluses
+        AdvisorController -> surplus : amount = getAmount()
+        AdvisorController -> AdvisorController : totalSurplus+=amount
+        AdvisorController -> surplus : period = getPeriod()
+        AdvisorController -> AdvisorController : totalRevenue+=amount * prices[period.getId()]
+    end loop
+end loop
+AdvisorController -> AdvisorController : GenerateSpreadsheet()
+AdvisorController --> Advisor : spreadsheet
+deactivate Advisor
+deactivate AdvisorController
+deactivate CustomerRepository
+deactivate Customer
+deactivate DeviceManager
+deactivate Device
+deactivate surplus
+
+@enduml
