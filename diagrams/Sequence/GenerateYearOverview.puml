@@ -1,4 +1,4 @@
-@startuml Generate municipality overview
+@startuml Generate year overview
 
 actor Advisor
 hide unlinked
@@ -13,31 +13,23 @@ activate DeviceManager
 activate Device
 activate surplus
 
-Advisor -> cmd : GenerateOverview(Municipality)
-cmd -> CustomerRepository : SelectCustomersByZipcodes([zipcodes])
-loop foreach zipcode in zipcodes
-    CustomerRepository -> CustomerRepository : customers+=GetCustomersByZipcode(zipcode)
-end loop
-CustomerRepository --> cmd : customers
+Advisor -> cmd : GenerateOverview("Year")
+cmd -> CustomerRepository : customers = findAllCustomers()
 loop foreach customer in customers
     cmd -> Customer : getPrices()
     cmd -> Customer : getDeviceManager()
-    cmd -> DeviceManager : devices = getDevices()
+    cmd -> DeviceManager : getDevices()
     loop foreach device in devices
-        cmd -> Device : yields = getDeviceYields()
         cmd -> Device : surpluses = getDeviceSurpluses()
-    end loop
-    loop foreach yield in yields
-        cmd -> cmd : totalYield += yield.getAmount()
     end loop
     loop foreach surplus in surpluses
         cmd -> surplus : amount = getAmount()
-        cmd -> cmd : totalSurplus+=amount
+        cmd -> cmd : totalSurplus += amount
         cmd -> surplus : period = getPeriod()
         cmd -> cmd : totalRevenue+=amount * prices[period.getId()]
     end loop
+    cmd -> cmd : addToSpreadsheet()
 end loop
-cmd -> cmd : GenerateSpreadsheet()
 cmd --> Advisor : spreadsheet
 deactivate Advisor
 deactivate cmd

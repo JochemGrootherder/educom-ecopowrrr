@@ -2,11 +2,13 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\DeviceSurplusRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: DeviceSurplusRepository::class)]
+#[ApiResource]
 class DeviceSurplus
 {
     #[ORM\Id]
@@ -14,13 +16,13 @@ class DeviceSurplus
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'deviceSurpluses')]
+    #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Period $period = null;
+    private ?Period $Period = null;
 
     #[ORM\ManyToOne(inversedBy: 'deviceSurpluses')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Device $device = null;
+    private ?Device $Device = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     private ?string $amount = null;
@@ -32,24 +34,24 @@ class DeviceSurplus
 
     public function getPeriod(): ?Period
     {
-        return $this->period;
+        return $this->Period;
     }
 
-    public function setPeriod(?Period $period): static
+    public function setPeriod(?Period $Period): static
     {
-        $this->period = $period;
+        $this->Period = $Period;
 
         return $this;
     }
 
     public function getDevice(): ?Device
     {
-        return $this->device;
+        return $this->Device;
     }
 
-    public function setDevice(?Device $device): static
+    public function setDevice(?Device $Device): static
     {
-        $this->device = $device;
+        $this->Device = $Device;
 
         return $this;
     }

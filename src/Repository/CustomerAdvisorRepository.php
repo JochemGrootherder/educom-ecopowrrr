@@ -16,6 +16,23 @@ class CustomerAdvisorRepository extends ServiceEntityRepository
         parent::__construct($registry, CustomerAdvisor::class);
     }
 
+    public function SaveCustomerAdvisor($params)
+    {
+        $customerAdvisor = new CustomerAdvisor();
+        $customerAdvisor->setUsername($params['username']);
+        $customerAdvisor->setPassword($params['password']);
+
+        $this->getEntityManager()->persist($customerAdvisor);
+        $this->getEntityManager()->flush();
+
+        return $customerAdvisor;
+    }
+
+    public function fetchCustomerAdvisor($id)
+    {
+        return $this->find($id);
+    }
+
     //    /**
     //     * @return CustomerAdvisor[] Returns an array of CustomerAdvisor objects
     //     */

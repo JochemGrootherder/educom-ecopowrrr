@@ -2,11 +2,13 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\MessageRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: MessageRepository::class)]
+#[ApiResource]
 class Message
 {
     #[ORM\Id]
@@ -14,9 +16,9 @@ class Message
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'messages')]
+    #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?DeviceManager $device_manager = null;
+    private ?DeviceManager $DeviceManager = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $date = null;
@@ -28,12 +30,12 @@ class Message
 
     public function getDeviceManager(): ?DeviceManager
     {
-        return $this->device_manager;
+        return $this->DeviceManager;
     }
 
-    public function setDeviceManager(?DeviceManager $device_manager): static
+    public function setDeviceManager(?DeviceManager $DeviceManager): static
     {
-        $this->device_manager = $device_manager;
+        $this->DeviceManager = $DeviceManager;
 
         return $this;
     }

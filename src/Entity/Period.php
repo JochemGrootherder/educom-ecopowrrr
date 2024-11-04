@@ -2,13 +2,13 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\PeriodRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PeriodRepository::class)]
+#[ApiResource]
 class Period
 {
     #[ORM\Id]
@@ -21,31 +21,6 @@ class Period
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $end_date = null;
-
-    /**
-     * @var Collection<int, DeviceYield>
-     */
-    #[ORM\OneToMany(targetEntity: DeviceYield::class, mappedBy: 'period')]
-    private Collection $deviceYields;
-
-    /**
-     * @var Collection<int, DeviceSurplus>
-     */
-    #[ORM\OneToMany(targetEntity: DeviceSurplus::class, mappedBy: 'period')]
-    private Collection $deviceSurpluses;
-
-    /**
-     * @var Collection<int, Price>
-     */
-    #[ORM\ManyToMany(targetEntity: Price::class, mappedBy: 'period')]
-    private Collection $prices;
-
-    public function __construct()
-    {
-        $this->deviceYields = new ArrayCollection();
-        $this->deviceSurpluses = new ArrayCollection();
-        $this->prices = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
@@ -72,93 +47,6 @@ class Period
     public function setEndDate(\DateTimeInterface $end_date): static
     {
         $this->end_date = $end_date;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, DeviceYield>
-     */
-    public function getDeviceYields(): Collection
-    {
-        return $this->deviceYields;
-    }
-
-    public function addDeviceYield(DeviceYield $deviceYield): static
-    {
-        if (!$this->deviceYields->contains($deviceYield)) {
-            $this->deviceYields->add($deviceYield);
-            $deviceYield->setPeriod($this);
-        }
-
-        return $this;
-    }
-
-    public function removeDeviceYield(DeviceYield $deviceYield): static
-    {
-        if ($this->deviceYields->removeElement($deviceYield)) {
-            // set the owning side to null (unless already changed)
-            if ($deviceYield->getPeriod() === $this) {
-                $deviceYield->setPeriod(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, DeviceSurplus>
-     */
-    public function getDeviceSurpluses(): Collection
-    {
-        return $this->deviceSurpluses;
-    }
-
-    public function addDeviceSurplus(DeviceSurplus $deviceSurplus): static
-    {
-        if (!$this->deviceSurpluses->contains($deviceSurplus)) {
-            $this->deviceSurpluses->add($deviceSurplus);
-            $deviceSurplus->setPeriod($this);
-        }
-
-        return $this;
-    }
-
-    public function removeDeviceSurplus(DeviceSurplus $deviceSurplus): static
-    {
-        if ($this->deviceSurpluses->removeElement($deviceSurplus)) {
-            // set the owning side to null (unless already changed)
-            if ($deviceSurplus->getPeriod() === $this) {
-                $deviceSurplus->setPeriod(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Price>
-     */
-    public function getPrices(): Collection
-    {
-        return $this->prices;
-    }
-
-    public function addPrice(Price $price): static
-    {
-        if (!$this->prices->contains($price)) {
-            $this->prices->add($price);
-            $price->addPeriod($this);
-        }
-
-        return $this;
-    }
-
-    public function removePrice(Price $price): static
-    {
-        if ($this->prices->removeElement($price)) {
-            $price->removePeriod($this);
-        }
 
         return $this;
     }

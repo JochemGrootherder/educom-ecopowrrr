@@ -2,12 +2,14 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\DeviceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: DeviceRepository::class)]
+#[ApiResource]
 class Device
 {
     #[ORM\Id]
@@ -17,35 +19,35 @@ class Device
 
     #[ORM\ManyToOne(inversedBy: 'devices')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?DeviceManager $device_manager = null;
+    private ?DeviceManager $DeviceManager = null;
 
-    #[ORM\Column]
+    #[ORM\Column(length: 80)]
     private ?string $serial_number = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?DeviceType $device_type = null;
+    private ?DeviceType $DeviceType = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?DeviceStatus $status = null;
+    private ?DeviceStatus $DeviceStatus = null;
 
     /**
-     * @var Collection<int, DeviceYields>
+     * @var Collection<int, DeviceYield>
      */
-    #[ORM\OneToMany(targetEntity: DeviceYield::class, mappedBy: 'device')]
+    #[ORM\OneToMany(targetEntity: DeviceYield::class, mappedBy: 'Device', orphanRemoval: true)]
     private Collection $deviceYields;
 
     /**
      * @var Collection<int, DeviceSurplus>
      */
-    #[ORM\OneToMany(targetEntity: DeviceSurplus::class, mappedBy: 'device')]
+    #[ORM\OneToMany(targetEntity: DeviceSurplus::class, mappedBy: 'Device', orphanRemoval: true)]
     private Collection $deviceSurpluses;
 
     public function __construct()
     {
-        $this->deviceSurpluses = new ArrayCollection();
         $this->deviceYields = new ArrayCollection();
+        $this->deviceSurpluses = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -55,12 +57,12 @@ class Device
 
     public function getDeviceManager(): ?DeviceManager
     {
-        return $this->device_manager;
+        return $this->DeviceManager;
     }
 
-    public function setDeviceManager(?DeviceManager $device_manager): static
+    public function setDeviceManager(?DeviceManager $DeviceManager): static
     {
-        $this->device_manager = $device_manager;
+        $this->DeviceManager = $DeviceManager;
 
         return $this;
     }
@@ -79,41 +81,41 @@ class Device
 
     public function getDeviceType(): ?DeviceType
     {
-        return $this->device_type;
+        return $this->DeviceType;
     }
 
-    public function setDeviceType(?DeviceType $device_type): static
+    public function setDeviceType(?DeviceType $DeviceType): static
     {
-        $this->device_type = $device_type;
+        $this->DeviceType = $DeviceType;
 
         return $this;
     }
 
-    public function getStatus(): ?DeviceStatus
+    public function getDeviceStatus(): ?DeviceStatus
     {
-        return $this->status;
+        return $this->DeviceStatus;
     }
 
-    public function setStatus(?DeviceStatus $status): static
+    public function setDeviceStatus(?DeviceStatus $DeviceStatus): static
     {
-        $this->status = $status;
+        $this->DeviceStatus = $DeviceStatus;
 
         return $this;
     }
 
     /**
-     * @return Collection<int, DeviceSurplus>
+     * @return Collection<int, DeviceYield>
      */
     public function getDeviceYields(): Collection
     {
-        return $this->DeviceYields;
+        return $this->deviceYields;
     }
 
     public function addDeviceYield(DeviceYield $deviceYield): static
     {
         if (!$this->deviceYields->contains($deviceYield)) {
             $this->deviceYields->add($deviceYield);
-            $deviceYields->setDevice($this);
+            $deviceYield->setDevice($this);
         }
 
         return $this;

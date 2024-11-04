@@ -2,13 +2,13 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\PriceRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PriceRepository::class)]
+#[ApiResource]
 class Price
 {
     #[ORM\Id]
@@ -16,23 +16,15 @@ class Price
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'prices')]
+    #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Customer $customer = null;
-
-    /**
-     * @var Collection<int, Period>
-     */
-    #[ORM\ManyToMany(targetEntity: Period::class, inversedBy: 'prices')]
-    private Collection $period;
+    private ?Customer $Customer = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 8, scale: 2)]
     private ?string $price = null;
 
-    public function __construct()
-    {
-        $this->period = new ArrayCollection();
-    }
+    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    private ?\DateTimeInterface $date = null;
 
     public function getId(): ?int
     {
@@ -41,36 +33,12 @@ class Price
 
     public function getCustomer(): ?Customer
     {
-        return $this->customer;
+        return $this->Customer;
     }
 
-    public function setCustomer(?Customer $customer): static
+    public function setCustomer(?Customer $Customer): static
     {
-        $this->customer = $customer;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Period>
-     */
-    public function getPeriod(): Collection
-    {
-        return $this->period;
-    }
-
-    public function addPeriod(Period $period): static
-    {
-        if (!$this->period->contains($period)) {
-            $this->period->add($period);
-        }
-
-        return $this;
-    }
-
-    public function removePeriod(Period $period): static
-    {
-        $this->period->removeElement($period);
+        $this->Customer = $Customer;
 
         return $this;
     }
@@ -83,6 +51,18 @@ class Price
     public function setPrice(string $price): static
     {
         $this->price = $price;
+
+        return $this;
+    }
+
+    public function getDate(): ?\DateTimeInterface
+    {
+        return $this->date;
+    }
+
+    public function setDate(\DateTimeInterface $date): static
+    {
+        $this->date = $date;
 
         return $this;
     }

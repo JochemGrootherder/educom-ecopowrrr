@@ -2,27 +2,19 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\CustomerRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CustomerRepository::class)]
+#[ApiResource]
 class Customer
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
-
-    #[ORM\OneToOne(inversedBy: 'customer', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?DeviceManager $device_manager = null;
-
-    #[ORM\ManyToOne(inversedBy: 'customers')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?CustomerAdvisor $customer_advisor = null;
 
     #[ORM\Column(length: 8)]
     private ?string $zipcode = null;
@@ -57,44 +49,16 @@ class Customer
     #[ORM\Column(length: 80, nullable: true)]
     private ?string $city = null;
 
-    /**
-     * @var Collection<int, Price>
-     */
-    #[ORM\OneToMany(targetEntity: Price::class, mappedBy: 'customer', orphanRemoval: true)]
-    private Collection $prices;
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?CustomerAdvisor $CustomerAdvisor = null;
 
-    public function __construct()
-    {
-        $this->prices = new ArrayCollection();
-    }
+    #[ORM\OneToOne(mappedBy: 'Customer', cascade: ['persist', 'remove'])]
+    private ?DeviceManager $deviceManager = null;
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getDeviceManager(): ?DeviceManager
-    {
-        return $this->device_manager;
-    }
-
-    public function setDeviceManager(DeviceManager $device_manager): static
-    {
-        $this->device_manager = $device_manager;
-
-        return $this;
-    }
-
-    public function getCustomerAdvisor(): ?CustomerAdvisor
-    {
-        return $this->customer_advisor;
-    }
-
-    public function setCustomerAdvisor(?CustomerAdvisor $customer_advisor): static
-    {
-        $this->customer_advisor = $customer_advisor;
-
-        return $this;
     }
 
     public function getZipcode(): ?string
@@ -105,6 +69,18 @@ class Customer
     public function setZipcode(string $zipcode): static
     {
         $this->zipcode = $zipcode;
+
+        return $this;
+    }
+
+    public function getCustomerAdvisor(): ?CustomerAdvisor
+    {
+        return $this->CustomerAdvisor;
+    }
+
+    public function setCustomerAdvisor(?CustomerAdvisor $CustomerAdvisor): static
+    {
+        $this->CustomerAdvisor = $CustomerAdvisor;
 
         return $this;
     }
@@ -229,32 +205,19 @@ class Customer
         return $this;
     }
 
-    /**
-     * @return Collection<int, Price>
-     */
-    public function getPrices(): Collection
+    public function getDeviceManager(): ?DeviceManager
     {
-        return $this->prices;
+        return $this->deviceManager;
     }
 
-    public function addPrice(Price $price): static
+    public function setDeviceManager(DeviceManager $deviceManager): static
     {
-        if (!$this->prices->contains($price)) {
-            $this->prices->add($price);
-            $price->setCustomer($this);
+        // set the owning side of the relation if necessary
+        if ($deviceManager->getCustomer() !== $this) {
+            $deviceManager->setCustomer($this);
         }
 
-        return $this;
-    }
-
-    public function removePrice(Price $price): static
-    {
-        if ($this->prices->removeElement($price)) {
-            // set the owning side to null (unless already changed)
-            if ($price->getCustomer() === $this) {
-                $price->setCustomer(null);
-            }
-        }
+        $this->deviceManager = $deviceManager;
 
         return $this;
     }

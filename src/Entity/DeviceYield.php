@@ -2,11 +2,13 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\DeviceYieldRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: DeviceYieldRepository::class)]
+#[ApiResource]
 class DeviceYield
 {
     #[ORM\Id]
@@ -14,30 +16,42 @@ class DeviceYield
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Period $Period = null;
+
     #[ORM\ManyToOne(inversedBy: 'deviceYields')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Device $device = null;
+    private ?Device $Device = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     private ?string $amount = null;
-
-    #[ORM\ManyToOne(inversedBy: 'deviceYields')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Period $period = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getDevice(): ?Device
+    public function getPeriod(): ?Period
     {
-        return $this->device;
+        return $this->Period;
     }
 
-    public function setDevice(?Device $device): static
+    public function setPeriod(?Period $Period): static
     {
-        $this->device = $device;
+        $this->Period = $Period;
+
+        return $this;
+    }
+
+    public function getDevice(): ?Device
+    {
+        return $this->Device;
+    }
+
+    public function setDevice(?Device $Device): static
+    {
+        $this->Device = $Device;
 
         return $this;
     }
@@ -50,18 +64,6 @@ class DeviceYield
     public function setAmount(string $amount): static
     {
         $this->amount = $amount;
-
-        return $this;
-    }
-
-    public function getPeriod(): ?Period
-    {
-        return $this->period;
-    }
-
-    public function setPeriod(?Period $period): static
-    {
-        $this->period = $period;
 
         return $this;
     }

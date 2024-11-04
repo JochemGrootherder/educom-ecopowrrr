@@ -2,10 +2,12 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\DeviceTypeRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: DeviceTypeRepository::class)]
+#[ApiResource]
 class DeviceType
 {
     #[ORM\Id]
@@ -13,7 +15,7 @@ class DeviceType
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 30)]
+    #[ORM\Column(length: 50)]
     private ?string $name = null;
 
     public function getId(): ?int
