@@ -16,6 +16,21 @@ class DeviceStatusRepository extends ServiceEntityRepository
         parent::__construct($registry, DeviceStatus::class);
     }
 
+    public function fetchStatus($name)
+    {
+        $name = strtolower($name);
+        $status = $this->findOneBy(['name' => $name]);
+        if($status == null)
+        {
+            $status = new Devicestatus();
+            $status->setName($name);
+            
+            $this->getEntityManager()->persist($status);
+            $this->getEntityManager()->flush();
+        }
+        return $status;
+    }
+
     //    /**
     //     * @return DeviceStatus[] Returns an array of DeviceStatus objects
     //     */

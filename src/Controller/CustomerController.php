@@ -24,12 +24,12 @@ class CustomerController extends AbstractController
     }
 
     #[Route('/create', name: 'createCustomer')]
-    public function CreateCustomer(ManagerRegistry $doctrine): Response
+    public function CreateCustomer(ManagerRegistry $doctrine)
     {
         $customer = 
         [
-            "zipcode" => "1234AB",
-            "housenumber" => 123,
+            "zipcode" => "",
+            "housenumber" => 17,
             "firstname" => "John",
             "lastname" => "Doe",
             "gender" => "male",
@@ -52,6 +52,10 @@ class CustomerController extends AbstractController
         $deviceManagerRep = $doctrine->getRepository(DeviceManager::class);
         $deviceManagerResult = $deviceManagerRep->saveDeviceManager($doctrine, $deviceManager);
 
-        dd($deviceManagerResult);
+        dump($deviceManagerResult);
+
+        return $this->render('customer/index.html.twig', [
+            'controller_name' => 'CustomerController',
+        ]);
     }
 }

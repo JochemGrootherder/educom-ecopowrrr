@@ -16,6 +16,36 @@ class DeviceSurplusRepository extends ServiceEntityRepository
         parent::__construct($registry, DeviceSurplus::class);
     }
 
+    public function saveDeviceSurplus($params)
+    {
+        $device = $params['device'];
+        $period = $params['period'];
+        $amount = $params['amount'];
+        $deviceSurplus = $this->fetchByDeviceAndPeriod($device, $period);
+        if(empty($deviceSurplus))
+        {
+            $deviceSurplus = new DeviceSurplus();
+            $deviceSurplus->setDevice($device);
+            $deviceSurplus->setPeriod($period);
+        }
+        dump($deviceSurplus->getAmount());
+        dump($amount);
+        $deviceSurplus->setAmount($deviceSurplus->getAmount() + $amount);
+        dump($deviceSurplus->getAmount());
+
+        $device->addDeviceSurplus($deviceSurplus);
+
+        $this->getEntityManager()->persist($deviceSurplus);
+        $this->getEntityManager()->flush();
+
+        return $deviceSurplus;
+    }
+
+    public function fetchByDeviceAndPeriod($device, $period)
+    {
+        $result = $this->findOneBy(["Device" => $device, "Period" => $period]);
+        return $result;
+    }
     //    /**
     //     * @return DeviceSurplus[] Returns an array of DeviceSurplus objects
     //     */

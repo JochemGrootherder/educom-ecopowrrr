@@ -7,6 +7,7 @@ use App\Repository\DeviceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints;
 
 #[ORM\Entity(repositoryClass: DeviceRepository::class)]
 #[ApiResource]
@@ -117,7 +118,6 @@ class Device
             $this->deviceYields->add($deviceYield);
             $deviceYield->setDevice($this);
         }
-
         return $this;
     }
 

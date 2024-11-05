@@ -37,15 +37,38 @@ class CustomerRepository extends ServiceEntityRepository
         $customer->setDateOfBirth($date);
         $customer->setBankDetails($params['bank_details']);
         $customer->setCustomerAdvisor($customerAdvisor);
-
-        //CITY AND ADRESS MUST BE GOTTEN FROM postcode.tech
-        $customer->setCity("Test");
-        $customer->setAddress("Test");
-
+        
+        $addressInfo = $this->GetAddressInfo($params['zipcode'], $params['housenumber']);
+        $customer->setCity("temp");
+        $customer->setAddress("temp");
+        if(!empty($addressInfo['city']))
+        {
+            $customer->setCity($addressInfo['city']);
+            $customer->setAddress($addressInfo['street']);
+        }
+        
         $this->getEntityManager()->persist($customer);
         $this->getEntityManager()->flush();
 
         return $customer;
+    }
+
+    private function GetAddressInfo(string $zipcode, string $housenumber)
+    {
+        $url = "https://postcode.tech/api/v1/postcode/full?postcode={$zipcode}&number={$housenumber}";
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        
+        $headers = array('Authorization: Bearer a055aa49-5445-4395-aded-18aa46d48e08');
+
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+
+        $response = curl_exec($curl);
+        curl_close($curl);
+
+        $data = json_decode($response, true);
+        return $data;
     }
 
     //    /**

@@ -16,6 +16,37 @@ class DeviceYieldRepository extends ServiceEntityRepository
         parent::__construct($registry, DeviceYield::class);
     }
 
+    public function saveDeviceYield($params)
+    {
+        $device = $params['device'];
+        $period = $params['period'];
+        $amount = $params['amount'];
+        $deviceYield = $this->fetchByDeviceAndPeriod($device, $period);
+        if(empty($deviceYield))
+        {
+            $deviceYield = new DeviceYield();
+            $deviceYield->setDevice($device);
+            $deviceYield->setPeriod($period);
+        }
+        dump($deviceYield->getAmount());
+        dump($amount);
+        $deviceYield->setAmount($deviceYield->getAmount() + $amount);
+        dump($deviceYield->getAmount());
+
+        $device->addDeviceYield($deviceYield);
+
+        $this->getEntityManager()->persist($deviceYield);
+        $this->getEntityManager()->flush();
+
+        return $deviceYield;
+    }
+
+    public function fetchByDeviceAndPeriod($device, $period)
+    {
+        $result = $this->findOneBy(["Device" => $device, "Period" => $period]);
+        return $result;
+    }
+
     //    /**
     //     * @return DeviceYield[] Returns an array of DeviceYield objects
     //     */

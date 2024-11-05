@@ -16,6 +16,21 @@ class DeviceTypeRepository extends ServiceEntityRepository
         parent::__construct($registry, DeviceType::class);
     }
 
+    public function fetchType($name)
+    {
+        $name = strtolower($name);
+        $type = $this->findOneBy(['name' => $name]);
+        if($type == null)
+        {
+            $type = new DeviceType();
+            $type->setName($name);
+            
+            $this->getEntityManager()->persist($type);
+            $this->getEntityManager()->flush();
+        }
+        return $type;
+    }
+
     //    /**
     //     * @return DeviceType[] Returns an array of DeviceType objects
     //     */
