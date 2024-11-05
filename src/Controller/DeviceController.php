@@ -32,7 +32,7 @@ class DeviceController extends AbstractController
             "deviceManagerId" => $deviceManagerId
         ];
         $deviceRep = $doctrine->getRepository(Device::class);
-        $deviceRep->saveDevice($doctrine, $device);
+        $deviceRep->saveDevice($device);
         dd($device);
 
         return $this->render('device/index.html.twig', [
@@ -47,8 +47,8 @@ class DeviceController extends AbstractController
         
         $periodRep = $doctrine->getRepository(Period::class);
         $period = $periodRep->getCurrentPeriod();
-        $deviceRep->generateRandomYield($doctrine, $deviceId, $period);
-        $deviceRep->generateRandomSurplus($doctrine, $deviceId, $period);
+        $deviceRep->generateRandomYield($deviceId, $period);
+        $deviceRep->generateRandomSurplus($deviceId, $period);
         
         dd($deviceRep->fetch($deviceId));
 

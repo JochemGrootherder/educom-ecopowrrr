@@ -21,6 +21,11 @@ class CustomerRepository extends ServiceEntityRepository
         parent::__construct($registry, Customer::class);
     }
 
+    public function fetch($id)
+    {
+        return $this->find($id);
+    }
+
     public function saveCustomer(ManagerRegistry $doctrine, $params)
     {
         $customerAdvisorRep = $doctrine->getRepository(CustomerAdvisor::class);

@@ -22,20 +22,20 @@ class DeviceRepository extends ServiceEntityRepository
         parent::__construct($registry, Device::class);
     }
 
-    public function saveDevice(ManagerRegistry $doctrine, $params)
+    public function saveDevice($params)
     {
         $device = new Device();
         $device->setSerialNumber($params['serialNumber']);
 
-        $statusRep = $doctrine->getRepository(DeviceStatus::class);
+        $statusRep = $this->getEntityManager()->getRepository(DeviceStatus::class);
         $status = $statusRep->fetchStatus($params['status']);
         $device->setDeviceStatus($status);
 
-        $deviceTypeRep = $doctrine->getRepository(DeviceType::class);
+        $deviceTypeRep = $this->getEntityManager()->getRepository(DeviceType::class);
         $deviceType = $deviceTypeRep->fetchType($params['type']);
         $device->setDeviceType($deviceType);
 
-        $deviceManagerRep = $doctrine->getRepository(DeviceManager::class);
+        $deviceManagerRep = $this->getEntityManager()->getRepository(DeviceManager::class);
         $deviceManager = $deviceManagerRep->fetchCustomerAdvisor($params['deviceManagerId']);
 
         $device->setDeviceManager($deviceManager);
@@ -51,7 +51,7 @@ class DeviceRepository extends ServiceEntityRepository
         return $this->find($id);
     }
 
-    public function generateRandomYield(ManagerRegistry $doctrine, $deviceId, $period)
+    public function generateRandomYield($deviceId, $period)
     {
         $device = $this->fetch($deviceId);
         $value = rand(0, 1000);
@@ -61,11 +61,11 @@ class DeviceRepository extends ServiceEntityRepository
             'amount' => $value
         ];
 
-        $deviceYieldRep = $doctrine->getRepository(DeviceYield::class);
+        $deviceYieldRep = $this->getEntityManager()->getRepository(DeviceYield::class);
         $deviceYieldRep->saveDeviceYield($deviceYield);
     }
 
-    public function generateRandomSurplus(ManagerRegistry $doctrine, $deviceId, $period)
+    public function generateRandomSurplus($deviceId, $period)
     {
         $device = $this->fetch($deviceId);
         $value = rand(-1000, 1000);
@@ -74,7 +74,7 @@ class DeviceRepository extends ServiceEntityRepository
             'period' => $period,
             'amount' => $value
         ];
-        $deviceSurplusRep = $doctrine->getRepository(DeviceSurplus::class);
+        $deviceSurplusRep = $this->getEntityManager()->getRepository(DeviceSurplus::class);
         $deviceSurplusRep->saveDeviceSurplus($deviceSurplus);
     }
 
