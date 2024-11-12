@@ -6,14 +6,25 @@ use ApiPlatform\Metadata\ApiResource;
 use App\Repository\DeviceYieldRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+
+
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ORM\Entity(repositoryClass: DeviceYieldRepository::class)]
 #[ApiResource]
+#[Delete]
+#[Get]
+#[Put(validationContext: [])]
+#[GetCollection]
+#[Post(validationContext: [])]
 class DeviceYield
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Assert\Uuid]
     private ?int $id = null;
 
     #[ORM\ManyToOne]
@@ -26,6 +37,17 @@ class DeviceYield
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     private ?string $amount = null;
+    
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
+    {
+        $metadata->addPropertyConstraint('amount', new Assert\Range([
+            'min' => 0,
+            'max' => 99999,
+        ]));
+        $metadata->addPropertyConstraint('period', new NotBlank());
+        $metadata->addPropertyConstraint('device', new NotBlank());
+        $metadata->addPropertyConstraint('amount', new NotBlank());
+    }
 
     public function getId(): ?int
     {

@@ -7,14 +7,25 @@ use App\Repository\DeviceManagerRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+
+
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ORM\Entity(repositoryClass: DeviceManagerRepository::class)]
 #[ApiResource]
+#[Delete]
+#[Get]
+#[Put(validationContext: [])]
+#[GetCollection]
+#[Post(validationContext: [])]
 class DeviceManager
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Assert\Uuid]
     private ?int $id = null;
 
     #[ORM\ManyToOne]
@@ -29,11 +40,17 @@ class DeviceManager
 
     #[ORM\OneToOne(inversedBy: 'deviceManager', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Customer $customer = null;
+    private ?Customer $Customer = null;
 
     public function __construct()
     {
         $this->devices = new ArrayCollection();
+    }
+
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
+    {
+        $metadata->addPropertyConstraint('status', new NotBlank());
+        $metadata->addPropertyConstraint('Customer', new NotBlank());
     }
 
     public function getId(): ?int
@@ -85,12 +102,12 @@ class DeviceManager
 
     public function getCustomer(): ?Customer
     {
-        return $this->customer;
+        return $this->Customer;
     }
 
-    public function setCustomer(Customer $customer): static
+    public function setCustomer(Customer $Customer): static
     {
-        $this->customer = $customer;
+        $this->Customer = $Customer;
 
         return $this;
     }

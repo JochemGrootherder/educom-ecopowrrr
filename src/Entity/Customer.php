@@ -17,9 +17,9 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 #[ApiResource]
 #[Delete]
 #[Get]
-#[Put(validationContext: ['groups' => ['Default', 'putValidation']])]
+#[Put(validationContext: [])]
 #[GetCollection]
-#[Post(validationContext: ['groups' => ['Default', 'postValidation']])]
+#[Post(validationContext: [])]
 class Customer
 {
     #[ORM\Id]
@@ -29,76 +29,107 @@ class Customer
     private ?int $id = null;
 
     #[ORM\Column(length: 8)]
-    #[Assert\NotBlank(groups: ['postValidation'])]
-    #[Assert\Length(min: 4, max: 8, groups: ['postValidation'])]
-    #[Assert\Length(min: 4, max: 8, groups: ['putValidation'])]
     private ?string $zipcode = null;
 
     #[ORM\Column]
-    #[Assert\NotBlank(groups: ['postValidation'])]
-    #[Assert\Length(min: 1, max: 5, groups: ['postValidation'])]
-    #[Assert\Length(min: 1, max: 5, groups: ['putValidation'])]
     private ?int $housenumber = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Assert\Length(min: 1, max: 50, groups: ['postValidation'])]
-    #[Assert\Length(min: 1, max: 50, groups: ['putValidation'])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 80)]
-    #[Assert\Length(min: 1, max: 80, groups: ['postValidation'])]
-    #[Assert\Length(min: 1, max: 80, groups: ['putValidation'])]
-    #[Assert\NotBlank(groups: ['postValidation'])]
     private ?string $lastname = null;
 
     #[ORM\Column(length: 20, nullable: true)]
-    #[Assert\Length(min: 0, max: 20, groups: ['postValidation'])]
-    #[Assert\Length(min: 0, max: 20, groups: ['putValidation'])]
     private ?string $gender = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(groups: ['postValidation'])]
-    #[Assert\Length(min: 5, max: 255, groups: ['postValidation'])]
-    #[Assert\Length(min: 5, max: 255, groups: ['putValidation'])]
     private ?string $email = null;
 
     #[ORM\Column(length: 20, nullable: true)]
-    #[Assert\Length(min: 0, max: 20, groups: ['putValidation'])]
-    #[Assert\Length(min: 0, max: 20, groups: ['postValidation'])]
     private ?string $phonenumber = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    #[Assert\Length(min: 10, max: 10, groups: ['postValidation'])]
-    #[Assert\Length(min: 10, max: 10, groups: ['putValidation'])]
     private ?\DateTimeInterface $dateOfBirth = null;
 
     #[ORM\Column(length: 50)]
-    #[Assert\Length(min: 0, max: 50, groups: ['postValidation'])]
-    #[Assert\Length(min: 0, max: 50, groups: ['putValidation'])]
-    #[Assert\NotBlank(groups: ['postValidation'])]
     private ?string $bankDetails = null;
 
     #[ORM\Column(length: 100, nullable: true)]
-    #[Assert\Length(min: 0, max: 100, groups: ['postValidation'])]
-    #[Assert\Length(min: 0, max: 100, groups: ['putValidation'])]
     private ?string $address = null;
 
     #[ORM\Column(length: 80, nullable: true)]
-    #[Assert\Length(min: 0, max: 80, groups: ['postValidation'])]
-    #[Assert\Length(min: 0, max: 80, groups: ['putValidation'])]
     private ?string $city = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Assert\NotBlank(groups: ['postValidation'])]
     private ?CustomerAdvisor $customerAdvisor = null;
 
     #[ORM\OneToOne(mappedBy: 'Customer', cascade: ['persist', 'remove'])]
     private ?DeviceManager $deviceManager = null;
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata) : void
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
+        $metadata->addPropertyConstraint('firstname', new Assert\Length([
+            'min' => 1,
+            'max' => 50,
+            'minMessage' => 'Your first name must be at least {{ limit }} characters long',
+            'maxMessage' => 'Your first name cannot be longer than {{ limit }} characters',
+        ]));
+        $metadata->addPropertyConstraint('lastname', new Assert\Length([
+            'min' => 1,
+            'max' => 80,
+            'minMessage' => 'Your last name must be at least {{ limit }} characters long',
+            'maxMessage' => 'Your last name cannot be longer than {{ limit }} characters',
+        ]));
+        $metadata->addPropertyConstraint('gender', new Assert\Length([
+            'min' => 0,
+            'max' => 20,
+            'minMessage' => 'Your last name must be at least {{ limit }} characters long',
+            'maxMessage' => 'Your last name cannot be longer than {{ limit }} characters',
+        ]));
+        $metadata->addPropertyConstraint('housenumber', new Assert\Length([
+            'min' => 1,
+            'max' => 5,
+            'minMessage' => 'Your last name must be at least {{ limit }} characters long',
+            'maxMessage' => 'Your last name cannot be longer than {{ limit }} characters',
+        ]));
+        $metadata->addPropertyConstraint('phonenumber', new Assert\Length([
+            'min' => 0,
+            'max' => 20,
+            'minMessage' => 'Your last name must be at least {{ limit }} characters long',
+            'maxMessage' => 'Your last name cannot be longer than {{ limit }} characters',
+        ]));
+        $metadata->addPropertyConstraint('bankDetails', new Assert\Length([
+            'min' => 1,
+            'max' => 50,
+            'minMessage' => 'Your last name must be at least {{ limit }} characters long',
+            'maxMessage' => 'Your last name cannot be longer than {{ limit }} characters',
+        ]));
+        $metadata->addPropertyConstraint('address', new Assert\Length([
+            'min' => 0,
+            'max' => 100,
+            'minMessage' => 'Your last name must be at least {{ limit }} characters long',
+            'maxMessage' => 'Your last name cannot be longer than {{ limit }} characters',
+        ]));
+        $metadata->addPropertyConstraint('city', new Assert\Length([
+            'min' => 0,
+            'max' => 80,
+            'minMessage' => 'Your last name must be at least {{ limit }} characters long',
+            'maxMessage' => 'Your last name cannot be longer than {{ limit }} characters',
+        ]));
+        
+        $metadata->addPropertyConstraint('dateOfBirth', new Assert\Date());
+
         $metadata->addPropertyConstraint('zipcode', new NotBlank());
+        $metadata->addPropertyConstraint('housenumber', new NotBlank());
+        $metadata->addPropertyConstraint('lastname', new NotBlank());
+        $metadata->addPropertyConstraint('bankDetails', new NotBlank());
+        $metadata->addPropertyConstraint('customerAdvisor', new NotBlank());
+        $metadata->addPropertyConstraint('email', new NotBlank());
+        $metadata->addPropertyConstraint('email', new Assert\Email([
+            'message' => 'The email "{{ value }}" is not a valid email.',
+        ]));
     }
 
     public function getId(): ?int
