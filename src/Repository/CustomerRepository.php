@@ -26,11 +26,23 @@ class CustomerRepository extends ServiceEntityRepository
         return $this->find($id);
     }
 
-    public function saveCustomer(ManagerRegistry $doctrine, $params)
+    public function fetchAll()
     {
-        $customerAdvisorRep = $doctrine->getRepository(CustomerAdvisor::class);
-        $customerAdvisor = $customerAdvisorRep->fetchCustomerAdvisor(1);
-        $customer = new Customer();
+        return $this->findAll();
+    }
+
+    public function saveCustomer($params)
+    {
+        if(!empty($params['id']))
+        {
+            $customer = $this->fetch($params['id']);
+        }
+        if(empty($customer))
+        {
+            $customer = new Customer();
+        }
+        $customerAdvisorRep = $this->getEntityManager()->getRepository(CustomerAdvisor::class);
+        $customerAdvisor = $customerAdvisorRep->fetchCustomerAdvisor($params['customer_advisor_id']);
         $customer->setZipcode($params['zipcode']);
         $customer->setHousenumber($params['housenumber']);
         $customer->setFirstName($params['firstname']);
@@ -75,6 +87,44 @@ class CustomerRepository extends ServiceEntityRepository
         $data = json_decode($response, true);
         return $data;
     }
+
+    public function CreateFromArray($data)
+    {
+        foreach($data as $values)
+        {
+            $customer = 
+            [
+                "id" => (int)$values["id"],
+                "customer_advisor_id" => (int)$values["customer_advisor_id"],
+                "zipcode" => $values["zipcode"],
+                "housenumber" => (int)$values["housenumber"],
+                "firstname" => $values["firstname"],
+                "lastname" => $values["lastname"],
+                "gender" => $values["gender"],
+                "email" => $values["email"],
+                "phonenumber" => $values["phonenumber"],
+                "date_of_birth" => $values["date_of_birth"],
+                "bank_details" => $values["bankdetails"]
+            ];
+            $this->SaveCustomer($customer);
+        }
+    }
+
+    public function findByZipcode(string $zipcode)
+    {
+        if(preg_match('/^[0-9]{4}$/', $zipcode))
+        {
+            $zipcode = '%'.$zipcode.'%';
+            $query = $this->getEntityManager()->createQuery(
+                'SELECT c
+                FROM App\Entity\customer c
+                WHERE c.zipcode LIKE :zipcode'
+            )->setParameter('zipcode', $zipcode);
+            
+            return $query->getResult();
+        }
+    }
+
 
     //    /**
     //     * @return Customer[] Returns an array of Customer objects

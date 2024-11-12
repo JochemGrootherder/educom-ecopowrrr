@@ -18,7 +18,7 @@ class Message
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?DeviceManager $DeviceManager = null;
+    private ?DeviceManager $deviceManager = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $date = null;
@@ -30,12 +30,12 @@ class Message
 
     public function getDeviceManager(): ?DeviceManager
     {
-        return $this->DeviceManager;
+        return $this->deviceManager;
     }
 
-    public function setDeviceManager(?DeviceManager $DeviceManager): static
+    public function setDeviceManager(?DeviceManager $deviceManager): static
     {
-        $this->DeviceManager = $DeviceManager;
+        $this->deviceManager = $deviceManager;
 
         return $this;
     }

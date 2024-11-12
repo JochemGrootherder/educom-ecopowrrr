@@ -18,15 +18,41 @@ class PeriodRepository extends ServiceEntityRepository
 
     public function savePeriod($params)
     {
-        // Create a new period entity
-        $period = new Period();
-        $period->setStartDate($params['start_date']);
-        $period->setEndDate($params['end_date']);
+        if(!empty($params['id']))
+        {
+            $period = $this->fetch($params['id']);
+        }
+        if(empty($period))
+        {
+            $period = new Period();
+        }
+        $start_date = date_create_from_format("Y-m-d", $params['start_date']);
+        $end_date = date_create_from_format("Y-m-d", $params['end_date']);
+        $period->setStartDate($start_date);
+        $period->setEndDate($end_date);
 
         // Save the period entity
         $this->getEntityManager()->persist($period);
         $this->getEntityManager()->flush();
         return $period;
+    }
+
+    public function fetch($id)
+    {
+        return $this->find($id);
+    }
+    public function CreateFromArray($data)
+    {
+        foreach($data as $values)
+        {
+            $period = 
+            [
+                "id" => (int)$values["id"],
+                "start_date" => $values["start_date"],
+                "end_date" => $values["end_date"],
+            ];
+            $this->savePeriod($period);
+        }
     }
 
     public function getCurrentPeriod()
@@ -60,6 +86,31 @@ class PeriodRepository extends ServiceEntityRepository
         return $result;
     }
 
+    public function getCurrentYearPeriods()
+    {
+        $currentYear = date('Y');
+        return $this->getYearPeriods($currentYear);
+    }
+
+    public function getYearPeriods($year)
+    {
+        $currentYearStartDate = $year . '-01-01';
+        $currentYearEndDate = $year . '-31-12';
+        $currentYearStartDate = date_create_from_format("Y-m-d", $currentYearStartDate);
+        $currentYearEndDate = date_create_from_format("Y-m-d", $currentYearEndDate);
+
+        $qb = $this->createQueryBuilder('p')
+        ->where('p.start_date >= :currentYearStartDate')
+        ->andWhere('p.end_date <= :currentYearEndDate')
+        ->setParameter('currentYearStartDate', $currentYearStartDate)
+        ->setParameter('currentYearEndDate', $currentYearEndDate);
+
+        $query = $qb->getQuery();
+
+        return $query->getResult();
+    }
+
+    
     //    /**
     //     * @return Period[] Returns an array of Period objects
     //     */

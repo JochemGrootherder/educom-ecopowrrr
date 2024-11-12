@@ -3,58 +3,103 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use Symfony\Component\Validator\Constraints as Assert;
 use App\Repository\CustomerRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
+//validators
+//api controller?
+
 #[ORM\Entity(repositoryClass: CustomerRepository::class)]
 #[ApiResource]
+#[Delete]
+#[Get]
+#[Put(validationContext: ['groups' => ['Default', 'putValidation']])]
+#[GetCollection]
+#[Post(validationContext: ['groups' => ['Default', 'postValidation']])]
 class Customer
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Assert\Uuid]
     private ?int $id = null;
 
     #[ORM\Column(length: 8)]
+    #[Assert\NotBlank(groups: ['postValidation'])]
+    #[Assert\Length(min: 4, max: 8, groups: ['postValidation'])]
+    #[Assert\Length(min: 4, max: 8, groups: ['putValidation'])]
     private ?string $zipcode = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank(groups: ['postValidation'])]
+    #[Assert\Length(min: 1, max: 5, groups: ['postValidation'])]
+    #[Assert\Length(min: 1, max: 5, groups: ['putValidation'])]
     private ?int $housenumber = null;
 
     #[ORM\Column(length: 50, nullable: true)]
+    #[Assert\Length(min: 1, max: 50, groups: ['postValidation'])]
+    #[Assert\Length(min: 1, max: 50, groups: ['putValidation'])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 80)]
+    #[Assert\Length(min: 1, max: 80, groups: ['postValidation'])]
+    #[Assert\Length(min: 1, max: 80, groups: ['putValidation'])]
+    #[Assert\NotBlank(groups: ['postValidation'])]
     private ?string $lastname = null;
 
     #[ORM\Column(length: 20, nullable: true)]
+    #[Assert\Length(min: 0, max: 20, groups: ['postValidation'])]
+    #[Assert\Length(min: 0, max: 20, groups: ['putValidation'])]
     private ?string $gender = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(groups: ['postValidation'])]
+    #[Assert\Length(min: 5, max: 255, groups: ['postValidation'])]
+    #[Assert\Length(min: 5, max: 255, groups: ['putValidation'])]
     private ?string $email = null;
 
     #[ORM\Column(length: 20, nullable: true)]
+    #[Assert\Length(min: 0, max: 20, groups: ['putValidation'])]
+    #[Assert\Length(min: 0, max: 20, groups: ['postValidation'])]
     private ?string $phonenumber = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $date_of_birth = null;
+    #[Assert\Length(min: 10, max: 10, groups: ['postValidation'])]
+    #[Assert\Length(min: 10, max: 10, groups: ['putValidation'])]
+    private ?\DateTimeInterface $dateOfBirth = null;
 
     #[ORM\Column(length: 50)]
-    private ?string $bank_details = null;
+    #[Assert\Length(min: 0, max: 50, groups: ['postValidation'])]
+    #[Assert\Length(min: 0, max: 50, groups: ['putValidation'])]
+    #[Assert\NotBlank(groups: ['postValidation'])]
+    private ?string $bankDetails = null;
 
     #[ORM\Column(length: 100, nullable: true)]
+    #[Assert\Length(min: 0, max: 100, groups: ['postValidation'])]
+    #[Assert\Length(min: 0, max: 100, groups: ['putValidation'])]
     private ?string $address = null;
 
     #[ORM\Column(length: 80, nullable: true)]
+    #[Assert\Length(min: 0, max: 80, groups: ['postValidation'])]
+    #[Assert\Length(min: 0, max: 80, groups: ['putValidation'])]
     private ?string $city = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?CustomerAdvisor $CustomerAdvisor = null;
+    #[Assert\NotBlank(groups: ['postValidation'])]
+    private ?CustomerAdvisor $customerAdvisor = null;
 
     #[ORM\OneToOne(mappedBy: 'Customer', cascade: ['persist', 'remove'])]
     private ?DeviceManager $deviceManager = null;
+
+    public static function loadValidatorMetadata(ClassMetadata $metadata) : void
+    {
+        $metadata->addPropertyConstraint('zipcode', new NotBlank());
+    }
 
     public function getId(): ?int
     {
@@ -75,12 +120,12 @@ class Customer
 
     public function getCustomerAdvisor(): ?CustomerAdvisor
     {
-        return $this->CustomerAdvisor;
+        return $this->customerAdvisor;
     }
 
-    public function setCustomerAdvisor(?CustomerAdvisor $CustomerAdvisor): static
+    public function setCustomerAdvisor(?CustomerAdvisor $customerAdvisor): static
     {
-        $this->CustomerAdvisor = $CustomerAdvisor;
+        $this->customerAdvisor = $customerAdvisor;
 
         return $this;
     }
@@ -159,24 +204,24 @@ class Customer
 
     public function getDateOfBirth(): ?\DateTimeInterface
     {
-        return $this->date_of_birth;
+        return $this->dateOfBirth;
     }
 
-    public function setDateOfBirth(?\DateTimeInterface $date_of_birth): static
+    public function setDateOfBirth(?\DateTimeInterface $dateOfBirth): static
     {
-        $this->date_of_birth = $date_of_birth;
+        $this->dateOfBirth = $dateOfBirth;
 
         return $this;
     }
 
     public function getBankDetails(): ?string
     {
-        return $this->bank_details;
+        return $this->bankDetails;
     }
 
-    public function setBankDetails(string $bank_details): static
+    public function setBankDetails(string $bankDetails): static
     {
-        $this->bank_details = $bank_details;
+        $this->bankDetails = $bankDetails;
 
         return $this;
     }

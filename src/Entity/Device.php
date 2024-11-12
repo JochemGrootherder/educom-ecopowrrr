@@ -20,18 +20,18 @@ class Device
 
     #[ORM\ManyToOne(inversedBy: 'devices')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?DeviceManager $DeviceManager = null;
+    private ?DeviceManager $deviceManager = null;
 
     #[ORM\Column(length: 80)]
-    private ?string $serial_number = null;
+    private ?string $serialNumber = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?DeviceType $DeviceType = null;
+    private ?DeviceType $deviceType = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?DeviceStatus $DeviceStatus = null;
+    private ?DeviceStatus $deviceStatus = null;
 
     /**
      * @var Collection<int, DeviceYield>
@@ -58,48 +58,48 @@ class Device
 
     public function getDeviceManager(): ?DeviceManager
     {
-        return $this->DeviceManager;
+        return $this->deviceManager;
     }
 
-    public function setDeviceManager(?DeviceManager $DeviceManager): static
+    public function setDeviceManager(?DeviceManager $deviceManager): static
     {
-        $this->DeviceManager = $DeviceManager;
+        $this->deviceManager = $deviceManager;
 
         return $this;
     }
 
     public function getSerialNumber(): ?string
     {
-        return $this->serial_number;
+        return $this->serialNumber;
     }
 
-    public function setSerialNumber(string $serial_number): static
+    public function setSerialNumber(string $serialNumber): static
     {
-        $this->serial_number = $serial_number;
+        $this->serialNumber = $serialNumber;
 
         return $this;
     }
 
     public function getDeviceType(): ?DeviceType
     {
-        return $this->DeviceType;
+        return $this->deviceType;
     }
 
-    public function setDeviceType(?DeviceType $DeviceType): static
+    public function setDeviceType(?DeviceType $deviceType): static
     {
-        $this->DeviceType = $DeviceType;
+        $this->deviceType = $deviceType;
 
         return $this;
     }
 
     public function getDeviceStatus(): ?DeviceStatus
     {
-        return $this->DeviceStatus;
+        return $this->deviceStatus;
     }
 
-    public function setDeviceStatus(?DeviceStatus $DeviceStatus): static
+    public function setDeviceStatus(?DeviceStatus $deviceStatus): static
     {
-        $this->DeviceStatus = $DeviceStatus;
+        $this->deviceStatus = $deviceStatus;
 
         return $this;
     }

@@ -29,7 +29,7 @@ class DeviceManager
 
     #[ORM\OneToOne(inversedBy: 'deviceManager', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Customer $Customer = null;
+    private ?Customer $customer = null;
 
     public function __construct()
     {
@@ -85,12 +85,12 @@ class DeviceManager
 
     public function getCustomer(): ?Customer
     {
-        return $this->Customer;
+        return $this->customer;
     }
 
-    public function setCustomer(Customer $Customer): static
+    public function setCustomer(Customer $customer): static
     {
-        $this->Customer = $Customer;
+        $this->customer = $customer;
 
         return $this;
     }

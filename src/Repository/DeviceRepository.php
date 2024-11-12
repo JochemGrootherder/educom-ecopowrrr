@@ -24,20 +24,26 @@ class DeviceRepository extends ServiceEntityRepository
 
     public function saveDevice($params)
     {
-        $device = new Device();
-        $device->setSerialNumber($params['serialNumber']);
+        if(!empty($params['id']))
+        {
+            $device = $this->fetch($params['id']);
+        }
+        if(empty($device))
+        {
+            $device = new Device();
+        }
+        $device->setSerialNumber($params['serial_number']);
 
         $statusRep = $this->getEntityManager()->getRepository(DeviceStatus::class);
-        $status = $statusRep->fetchStatus($params['status']);
+        $status = $statusRep->fetchStatus($params['device_status']);
         $device->setDeviceStatus($status);
 
         $deviceTypeRep = $this->getEntityManager()->getRepository(DeviceType::class);
-        $deviceType = $deviceTypeRep->fetchType($params['type']);
+        $deviceType = $deviceTypeRep->fetchType($params['device_type']);
         $device->setDeviceType($deviceType);
 
         $deviceManagerRep = $this->getEntityManager()->getRepository(DeviceManager::class);
-        $deviceManager = $deviceManagerRep->fetchCustomerAdvisor($params['deviceManagerId']);
-
+        $deviceManager = $deviceManagerRep->fetch($params['device_manager_id']);
         $device->setDeviceManager($deviceManager);
 
         $this->getEntityManager()->persist($device);
@@ -49,6 +55,22 @@ class DeviceRepository extends ServiceEntityRepository
     public function fetch($id)
     {
         return $this->find($id);
+    }
+    
+    public function CreateFromArray($data)
+    {
+        foreach($data as $values)
+        {
+            $Device = 
+            [
+                "id" => (int)$values["id"],
+                "device_status" => $values["device_status"],
+                "device_manager_id" => $values["device_manager_id"],
+                "device_type" => $values["device_type"],
+                "serial_number" => $values["serial_number"]
+            ];
+            $this->saveDevice($Device);
+        }
     }
 
     public function generateRandomYield($deviceId, $period)

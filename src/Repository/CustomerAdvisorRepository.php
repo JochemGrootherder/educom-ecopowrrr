@@ -18,7 +18,14 @@ class CustomerAdvisorRepository extends ServiceEntityRepository
 
     public function SaveCustomerAdvisor($params)
     {
-        $customerAdvisor = new CustomerAdvisor();
+        if(!empty($params['id']))
+        {
+            $customerAdvisor = $this->fetchCustomerAdvisor($params['id']);
+        }
+        if(empty($customerAdvisor))
+        {
+            $customerAdvisor = new CustomerAdvisor();
+        }
         $customerAdvisor->setUsername($params['username']);
         $customerAdvisor->setPassword($params['password']);
 
@@ -31,6 +38,20 @@ class CustomerAdvisorRepository extends ServiceEntityRepository
     public function fetchCustomerAdvisor($id)
     {
         return $this->find($id);
+    }
+
+    public function CreateFromArray($data)
+    {
+        foreach($data as $values)
+        {
+            $customerAdvisor = 
+            [
+                "id" => (int)$values["id"],
+                "username" => $values["username"],
+                "password" => $values["password"]
+            ];
+            $this->SaveCustomerAdvisor($customerAdvisor);
+        }
     }
 
     //    /**

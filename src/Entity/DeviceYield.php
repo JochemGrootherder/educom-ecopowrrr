@@ -18,11 +18,11 @@ class DeviceYield
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Period $Period = null;
+    private ?Period $period = null;
 
     #[ORM\ManyToOne(inversedBy: 'deviceYields')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Device $Device = null;
+    private ?Device $device = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     private ?string $amount = null;
@@ -34,24 +34,24 @@ class DeviceYield
 
     public function getPeriod(): ?Period
     {
-        return $this->Period;
+        return $this->period;
     }
 
-    public function setPeriod(?Period $Period): static
+    public function setPeriod(?Period $period): static
     {
-        $this->Period = $Period;
+        $this->period = $period;
 
         return $this;
     }
 
     public function getDevice(): ?Device
     {
-        return $this->Device;
+        return $this->device;
     }
 
-    public function setDevice(?Device $Device): static
+    public function setDevice(?Device $device): static
     {
-        $this->Device = $Device;
+        $this->device = $device;
 
         return $this;
     }

@@ -6,6 +6,9 @@ use App\Entity\DeviceYield;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+use App\Entity\Device;
+use App\Entity\Period;
+
 /**
  * @extends ServiceEntityRepository<DeviceYield>
  */
@@ -18,8 +21,25 @@ class DeviceYieldRepository extends ServiceEntityRepository
 
     public function saveDeviceYield($params)
     {
-        $device = $params['device'];
-        $period = $params['period'];
+        if(!empty($params['device_id']))
+        {
+            $deviceRep = $this->getEntityManager()->getRepository(Device::class);
+            $device = $deviceRep->fetch($params['device_id']);
+        }
+        else
+        {
+            $device = $params['device'];
+        }
+        if(!empty($params['period_id']))
+        {
+            $periodRep = $this->getEntityManager()->getRepository(Period::class);
+            $period = $periodRep->fetch($params['period_id']);
+        }
+        else
+        {
+            $period = $params['period'];
+        }
+
         $amount = $params['amount'];
         $deviceYield = $this->fetchByDeviceAndPeriod($device, $period);
         if(empty($deviceYield))
@@ -28,10 +48,7 @@ class DeviceYieldRepository extends ServiceEntityRepository
             $deviceYield->setDevice($device);
             $deviceYield->setPeriod($period);
         }
-        dump($deviceYield->getAmount());
-        dump($amount);
         $deviceYield->setAmount($deviceYield->getAmount() + $amount);
-        dump($deviceYield->getAmount());
 
         $device->addDeviceYield($deviceYield);
 
@@ -39,6 +56,20 @@ class DeviceYieldRepository extends ServiceEntityRepository
         $this->getEntityManager()->flush();
 
         return $deviceYield;
+    }
+    public function CreateFromArray($data)
+    {
+        foreach($data as $values)
+        {
+            $yield = 
+            [
+                "id" => (int)$values["id"],
+                "device_id" => $values["device_id"],
+                "period_id" => $values["period_id"],
+                "amount" => $values["amount"]
+            ];
+            $this->saveDeviceYield($yield);
+        }
     }
 
     public function fetchByDeviceAndPeriod($device, $period)

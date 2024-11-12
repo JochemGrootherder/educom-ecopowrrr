@@ -26,10 +26,10 @@ class DeviceController extends AbstractController
     {
         $device = 
         [
-            "serialNumber" => "testDevice123",
-            "status" => "active",
-            "type" => "solar",
-            "deviceManagerId" => $deviceManagerId
+            "serial_number" => "testDevice123",
+            "device_status" => "active",
+            "device_type" => "solar",
+            "device_manager_id" => $deviceManagerId
         ];
         $deviceRep = $doctrine->getRepository(Device::class);
         $deviceRep->saveDevice($device);

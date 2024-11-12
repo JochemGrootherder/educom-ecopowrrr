@@ -6,6 +6,9 @@ use App\Entity\DeviceSurplus;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+use App\Entity\Device;
+use App\Entity\Period;
+
 /**
  * @extends ServiceEntityRepository<DeviceSurplus>
  */
@@ -18,8 +21,25 @@ class DeviceSurplusRepository extends ServiceEntityRepository
 
     public function saveDeviceSurplus($params)
     {
-        $device = $params['device'];
-        $period = $params['period'];
+        if(!empty($params['device_id']))
+        {
+            $deviceRep = $this->getEntityManager()->getRepository(Device::class);
+            $device = $deviceRep->fetch($params['device_id']);
+        }
+        else
+        {
+            $device = $params['device'];
+        }
+        if(!empty($params['period_id']))
+        {
+            $periodRep = $this->getEntityManager()->getRepository(Period::class);
+            $period = $periodRep->fetch($params['period_id']);
+        }
+        else
+        {
+            $period = $params['period'];
+        }
+
         $amount = $params['amount'];
         $deviceSurplus = $this->fetchByDeviceAndPeriod($device, $period);
         if(empty($deviceSurplus))
@@ -28,10 +48,7 @@ class DeviceSurplusRepository extends ServiceEntityRepository
             $deviceSurplus->setDevice($device);
             $deviceSurplus->setPeriod($period);
         }
-        dump($deviceSurplus->getAmount());
-        dump($amount);
         $deviceSurplus->setAmount($deviceSurplus->getAmount() + $amount);
-        dump($deviceSurplus->getAmount());
 
         $device->addDeviceSurplus($deviceSurplus);
 
@@ -39,6 +56,21 @@ class DeviceSurplusRepository extends ServiceEntityRepository
         $this->getEntityManager()->flush();
 
         return $deviceSurplus;
+    }
+    
+    public function CreateFromArray($data)
+    {
+        foreach($data as $values)
+        {
+            $surplus = 
+            [
+                "id" => (int)$values["id"],
+                "device_id" => $values["device_id"],
+                "period_id" => $values["period_id"],
+                "amount" => $values["amount"]
+            ];
+            $this->saveDeviceSurplus($surplus);
+        }
     }
 
     public function fetchByDeviceAndPeriod($device, $period)

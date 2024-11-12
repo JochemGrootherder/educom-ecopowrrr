@@ -18,7 +18,7 @@ class Price
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Customer $Customer = null;
+    private ?Customer $customer = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 8, scale: 2)]
     private ?string $price = null;
@@ -33,12 +33,12 @@ class Price
 
     public function getCustomer(): ?Customer
     {
-        return $this->Customer;
+        return $this->customer;
     }
 
-    public function setCustomer(?Customer $Customer): static
+    public function setCustomer(?Customer $customer): static
     {
-        $this->Customer = $Customer;
+        $this->customer = $customer;
 
         return $this;
     }

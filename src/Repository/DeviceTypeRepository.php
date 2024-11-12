@@ -16,6 +16,35 @@ class DeviceTypeRepository extends ServiceEntityRepository
         parent::__construct($registry, DeviceType::class);
     }
 
+    public function saveDeviceType($params)
+    {
+        if(!empty($params['id']))
+        {
+            $deviceType = $this->find($params['id']);
+        }
+        if(empty($deviceType))
+        {
+            $deviceType = new DeviceType();
+        }
+        $deviceType->setName($params['name']);
+        $this->getEntityManager()->persist($deviceType);
+        $this->getEntityManager()->flush();
+        return $deviceType;
+    }
+
+    public function CreateFromArray($data)
+    {
+        foreach($data as $values)
+        {
+            $deviceType = 
+            [
+                "id" => (int)$values["id"],
+                "name" => $values["name"]
+            ];
+            $this->saveDeviceType($deviceType);
+        }
+    }
+
     public function fetchType($name)
     {
         $name = strtolower($name);

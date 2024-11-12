@@ -22,16 +22,22 @@ class DeviceManagerRepository extends ServiceEntityRepository
         parent::__construct($registry, DeviceManager::class);
     }
 
-    public function saveDeviceManager(ManagerRegistry $doctrine, $params)
+    public function saveDeviceManager($params)
     {
-        $deviceManager = new DeviceManager();
-
-        $customerRep = $doctrine->getRepository(Customer::class);
+        if(!empty($params['id']))
+        {
+            $deviceManager = $this->fetch($params['id']);
+        }
+        if(empty($deviceManager))
+        {
+            $deviceManager = new DeviceManager();
+        }
+        $customerRep = $this->getEntityManager()->getRepository(Customer::class);
         $customer = $customerRep->find($params['customer_id']);
         $deviceManager->setCustomer($customer);
 
-        $deviceStatusRep = $doctrine->getRepository(DeviceStatus::class);
-        $deviceStatus = $deviceStatusRep->find($params['status_id']);
+        $deviceStatusRep = $this->getEntityManager()->getRepository(DeviceStatus::class);
+        $deviceStatus = $deviceStatusRep->fetchStatus($params['status']);
 
         $deviceManager->setStatus($deviceStatus);
 
@@ -41,9 +47,23 @@ class DeviceManagerRepository extends ServiceEntityRepository
         return $deviceManager;
     }
 
-    public function fetchCustomerAdvisor($id)
+    public function fetch($id)
     {
         return $this->find($id);
+    }
+
+    public function CreateFromArray($data)
+    {
+        foreach($data as $values)
+        {
+            $DeviceManager = 
+            [
+                "id" => (int)$values["id"],
+                "status" => $values["status"],
+                "customer_id" => $values["customer_id"]
+            ];
+            $this->saveDeviceManager($DeviceManager);
+        }
     }
 
 //    /**

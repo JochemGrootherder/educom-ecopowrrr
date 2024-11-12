@@ -30,6 +30,10 @@ class PriceController extends AbstractController
     public function updatePrice($customer_id, $price) : Response
     {
         $priceRep = $this->doctrine->getRepository(Price::class);
-        $priceRep->savePrice($customer_id, $price);
+        $priceArr = [
+            "customer_id" => $customer_id,
+            "price" => $price
+        ];
+        $priceRep->savePrice($priceArr);
     }
 }

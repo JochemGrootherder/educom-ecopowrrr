@@ -16,6 +16,35 @@ class DeviceStatusRepository extends ServiceEntityRepository
         parent::__construct($registry, DeviceStatus::class);
     }
 
+    public function saveDeviceStatus($params)
+    {
+        if(!empty($params['id']))
+        {
+            $deviceStatus = $this->find($params['id']);
+        }
+        if(empty($deviceStatus))
+        {
+            $deviceStatus = new DeviceStatus();
+        }
+        $deviceStatus->setName($params['name']);
+        $this->getEntityManager()->persist($deviceStatus);
+        $this->getEntityManager()->flush();
+        return $deviceStatus;
+    }
+
+    public function CreateFromArray($data)
+    {
+        foreach($data as $values)
+        {
+            $deviceStatus = 
+            [
+                "id" => (int)$values["id"],
+                "name" => $values["name"]
+            ];
+            $this->saveDeviceStatus($deviceStatus);
+        }
+    }
+
     public function fetchStatus($name)
     {
         $name = strtolower($name);

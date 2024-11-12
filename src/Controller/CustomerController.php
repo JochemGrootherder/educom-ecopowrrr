@@ -2,10 +2,14 @@
 
 namespace App\Controller;
 
+require __DIR__.'/../../vendor/autoload.php';
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\Persistence\ManagerRegistry;
+
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 use App\Entity\Customer;
 use App\Entity\DeviceManager;
@@ -40,7 +44,7 @@ class CustomerController extends AbstractController
         ];
 
         $customerRep = $doctrine->getRepository(Customer::class);
-        $customerResult = $customerRep->saveCustomer($doctrine, $customer);
+        $customerResult = $customerRep->saveCustomer($customer);
         dump($customerResult);
 
         $deviceManager =
@@ -50,12 +54,24 @@ class CustomerController extends AbstractController
         ];
 
         $deviceManagerRep = $doctrine->getRepository(DeviceManager::class);
-        $deviceManagerResult = $deviceManagerRep->saveDeviceManager($doctrine, $deviceManager);
+        $deviceManagerResult = $deviceManagerRep->saveDeviceManager($deviceManager);
 
         dump($deviceManagerResult);
 
         return $this->render('customer/index.html.twig', [
             'controller_name' => 'CustomerController',
         ]);
+    }
+
+    #[Route('/readSpreadsheet', name: 'readSpreadsheet')]
+    public function readSpreadsheet()
+    {
+        $inputFileName = __DIR__.'/../../mockData/mockData.xlsx';
+        $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
+        
+        $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load('./mockData.xlsx');
+        //$spreadsheet = $reader->load($inputFileName);
+        //$activeSheet = $spreadsheet->setActiveSheetIndexByName('customer');
+        dd($spreadsheet);
     }
 }

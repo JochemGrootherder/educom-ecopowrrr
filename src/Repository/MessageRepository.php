@@ -15,6 +15,18 @@ class MessageRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Message::class);
     }
+    public function CreateFromArray($data)
+    {
+        foreach($data as $values)
+        {
+            $yield = 
+            [
+                "id" => (int)$values["id"],
+                "device_manager_id" => $values["device_manager_id"],
+                "date" => $values["date"],
+            ];
+        }
+    }
 
     //    /**
     //     * @return Message[] Returns an array of Message objects
