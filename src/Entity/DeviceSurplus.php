@@ -29,11 +29,11 @@ class DeviceSurplus
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Period $period = null;
+    private ?Period $Period = null;
 
     #[ORM\ManyToOne(inversedBy: 'deviceSurpluses')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Device $device = null;
+    private ?Device $Device = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     private ?string $amount = null;
@@ -44,7 +44,7 @@ class DeviceSurplus
             'min' => -99999,
             'max' => 99999,
         ]));
-        $metadata->addPropertyConstraint('period', new NotBlank());
+        $metadata->addPropertyConstraint('Period', new NotBlank());
         $metadata->addPropertyConstraint('device', new NotBlank());
         $metadata->addPropertyConstraint('amount', new NotBlank());
     }
@@ -56,24 +56,24 @@ class DeviceSurplus
 
     public function getPeriod(): ?Period
     {
-        return $this->period;
+        return $this->Period;
     }
 
-    public function setPeriod(?Period $period): static
+    public function setPeriod(?Period $Period): static
     {
-        $this->period = $period;
+        $this->Period = $Period;
 
         return $this;
     }
 
     public function getDevice(): ?Device
     {
-        return $this->device;
+        return $this->Device;
     }
 
-    public function setDevice(?Device $device): static
+    public function setDevice(?Device $Device): static
     {
-        $this->device = $device;
+        $this->Device = $Device;
 
         return $this;
     }

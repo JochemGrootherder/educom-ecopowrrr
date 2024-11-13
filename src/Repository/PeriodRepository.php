@@ -26,10 +26,10 @@ class PeriodRepository extends ServiceEntityRepository
         {
             $period = new Period();
         }
-        $start_date = date_create_from_format("Y-m-d", $params['start_date']);
-        $end_date = date_create_from_format("Y-m-d", $params['end_date']);
-        $period->setStartDate($start_date);
-        $period->setEndDate($end_date);
+        $startDate = date_create_from_format("Y-m-d", $params['startDate']);
+        $endDate = date_create_from_format("Y-m-d", $params['endDate']);
+        $period->setStartDate($startDate);
+        $period->setEndDate($endDate);
 
         // Save the period entity
         $this->getEntityManager()->persist($period);
@@ -48,8 +48,8 @@ class PeriodRepository extends ServiceEntityRepository
             $period = 
             [
                 "id" => (int)$values["id"],
-                "start_date" => $values["start_date"],
-                "end_date" => $values["end_date"],
+                "startDate" => $values["startDate"],
+                "endDate" => $values["endDate"],
             ];
             $this->savePeriod($period);
         }
@@ -67,7 +67,7 @@ class PeriodRepository extends ServiceEntityRepository
         $query = $this->getEntityManager()->createQuery(
             'SELECT p
             FROM App\Entity\Period p
-            WHERE :currentDate BETWEEN p.start_date AND p.end_date'
+            WHERE :currentDate BETWEEN p.startDate AND p.endDate'
         )->setParameter('currentDate', $date);
 
         $result = $query->getResult();
@@ -77,8 +77,8 @@ class PeriodRepository extends ServiceEntityRepository
         {
             $period = 
             [
-                'start_date' => $date,
-                'end_date' => $date
+                'startDate' => $date,
+                'endDate' => $date
             ];
 
             $result = $this->savePeriod($period);
@@ -100,8 +100,8 @@ class PeriodRepository extends ServiceEntityRepository
         $currentYearEndDate = date_create_from_format("Y-m-d", $currentYearEndDate);
 
         $qb = $this->createQueryBuilder('p')
-        ->where('p.start_date >= :currentYearStartDate')
-        ->andWhere('p.end_date <= :currentYearEndDate')
+        ->where('p.startDate >= :currentYearStartDate')
+        ->andWhere('p.endDate <= :currentYearEndDate')
         ->setParameter('currentYearStartDate', $currentYearStartDate)
         ->setParameter('currentYearEndDate', $currentYearEndDate);
 

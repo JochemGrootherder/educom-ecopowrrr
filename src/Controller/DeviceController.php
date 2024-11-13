@@ -44,13 +44,13 @@ class DeviceController extends AbstractController
     public function GenerateDeviceYieldAndSurplus($deviceId, ManagerRegistry $doctrine) : Response
     {
         $deviceRep = $doctrine->getRepository(Device::class);
-        
-        $periodRep = $doctrine->getRepository(Period::class);
-        $period = $periodRep->getCurrentPeriod();
-        $deviceRep->generateRandomYield($deviceId, $period);
-        $deviceRep->generateRandomSurplus($deviceId, $period);
-        
-        dd($deviceRep->fetch($deviceId));
+        $device = $deviceRep->fetch($deviceId);
+        if($device)
+        {
+            $periodRep = $doctrine->getRepository(Period::class);
+            $period = $periodRep->getCurrentPeriod();
+            $deviceRep->generateRandomYieldAndSurplus($device, $period);
+        }
 
         return $this->render('device/index.html.twig', [
             'controller_name' => 'DeviceController',

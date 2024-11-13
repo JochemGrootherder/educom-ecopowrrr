@@ -31,7 +31,7 @@ class Device
 
     #[ORM\ManyToOne(inversedBy: 'devices')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?DeviceManager $deviceManager = null;
+    private ?DeviceManager $DeviceManager = null;
 
     #[ORM\Column(length: 80)]
     private ?string $serialNumber = null;
@@ -76,6 +76,63 @@ class Device
         $metadata->addPropertyConstraint('deviceType', new NotBlank());
         $metadata->addPropertyConstraint('deviceStatus', new NotBlank());
     }
+
+    public function getYieldUntillPeriod($period)
+    {
+        $totalYield = 0.0;
+        foreach($this->deviceYields as $yield)
+        {
+            $yieldPeriod = $yield->getPeriod();
+            $yieldEndDate = $yieldPeriod->getEndDate();
+            $periodEndDate = $period->getEndDate();
+            if($yieldEndDate <= $periodEndDate)
+            {
+                $totalYield += $yield->getAmount();
+            }
+        }
+        return $totalYield;
+    }
+
+    public function getPeriodYield($period)
+    {
+        foreach($this->deviceYields as $yield)
+        {
+            if($yield->getPeriod() === $period)
+            {
+                return $yield;
+            }
+        }
+        return null;
+    }
+
+    public function getSurplusUntillPeriod($period)
+    {
+        $totalSurplus = 0.0;
+        foreach($this->deviceSurpluses as $surplus)
+        {
+            $surplusPeriod = $surplus->getPeriod();
+            $surplusEndDate = $surplusPeriod->getEndDate();
+            $periodEndDate = $period->getEndDate();
+            if($surplusEndDate <= $periodEndDate)
+            {
+                $totalSurplus += $surplus->getAmount();
+            }
+        }
+        return $totalSurplus;
+    }
+
+    public function getPeriodSurplus($period)
+    {
+        foreach($this->deviceSurpluses as $surplus)
+        {
+            if($surplus->getPeriod() === $period)
+            {
+                return $surplus;
+            }
+        }
+        return null;
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -83,12 +140,12 @@ class Device
 
     public function getDeviceManager(): ?DeviceManager
     {
-        return $this->deviceManager;
+        return $this->DeviceManager;
     }
 
-    public function setDeviceManager(?DeviceManager $deviceManager): static
+    public function setDeviceManager(?DeviceManager $DeviceManager): static
     {
-        $this->deviceManager = $deviceManager;
+        $this->DeviceManager = $DeviceManager;
 
         return $this;
     }

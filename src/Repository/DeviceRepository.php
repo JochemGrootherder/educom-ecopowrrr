@@ -24,6 +24,7 @@ class DeviceRepository extends ServiceEntityRepository
 
     public function saveDevice($params)
     {
+        $device = null;
         if(!empty($params['id']))
         {
             $device = $this->fetch($params['id']);
@@ -44,6 +45,10 @@ class DeviceRepository extends ServiceEntityRepository
 
         $deviceManagerRep = $this->getEntityManager()->getRepository(DeviceManager::class);
         $deviceManager = $deviceManagerRep->fetch($params['device_manager_id']);
+        if(!$deviceManager)
+        {
+            return false;
+        }
         $device->setDeviceManager($deviceManager);
 
         $this->getEntityManager()->persist($device);
@@ -73,9 +78,8 @@ class DeviceRepository extends ServiceEntityRepository
         }
     }
 
-    public function generateRandomYield($deviceId, $period)
+    public function generateRandomYield($device, $period)
     {
-        $device = $this->fetch($deviceId);
         $value = rand(0, 1000);
         $deviceYield = [
             'device' => $device,
@@ -87,9 +91,8 @@ class DeviceRepository extends ServiceEntityRepository
         $deviceYieldRep->saveDeviceYield($deviceYield);
     }
 
-    public function generateRandomSurplus($deviceId, $period)
+    public function generateRandomSurplus($device, $period)
     {
-        $device = $this->fetch($deviceId);
         $value = rand(-1000, 1000);
         $deviceSurplus = [
             'device' => $device,
@@ -98,6 +101,18 @@ class DeviceRepository extends ServiceEntityRepository
         ];
         $deviceSurplusRep = $this->getEntityManager()->getRepository(DeviceSurplus::class);
         $deviceSurplusRep->saveDeviceSurplus($deviceSurplus);
+    }
+
+    public function generateRandomYieldAndSurplus($deviceId, $period)
+    {
+        $device = $this->fetch($deviceId);
+        if($device)
+        {
+            $this->generateRandomYield($device, $period);
+            $this->generateRandomSurplus($device, $period);
+            return true;
+        }
+        return false;
     }
 
     //    /**
