@@ -27,16 +27,15 @@ class DeviceSurplus
     #[Assert\Uuid]
     private ?int $id = null;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Period $Period = null;
-
-    #[ORM\ManyToOne(inversedBy: 'deviceSurpluses')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Device $Device = null;
-
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     private ?string $amount = null;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    private ?\DateTimeInterface $date = null;
+
+    #[ORM\ManyToOne(inversedBy: 'surpluses')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?DeviceManager $DeviceManager = null;
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
@@ -44,38 +43,14 @@ class DeviceSurplus
             'min' => -99999,
             'max' => 99999,
         ]));
-        $metadata->addPropertyConstraint('Period', new NotBlank());
-        $metadata->addPropertyConstraint('device', new NotBlank());
+        $metadata->addPropertyConstraint('date', new NotBlank());
+        $metadata->addPropertyConstraint('DeviceManager', new NotBlank());
         $metadata->addPropertyConstraint('amount', new NotBlank());
     }
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getPeriod(): ?Period
-    {
-        return $this->Period;
-    }
-
-    public function setPeriod(?Period $Period): static
-    {
-        $this->Period = $Period;
-
-        return $this;
-    }
-
-    public function getDevice(): ?Device
-    {
-        return $this->Device;
-    }
-
-    public function setDevice(?Device $Device): static
-    {
-        $this->Device = $Device;
-
-        return $this;
     }
 
     public function getAmount(): ?string
@@ -86,6 +61,30 @@ class DeviceSurplus
     public function setAmount(string $amount): static
     {
         $this->amount = $amount;
+
+        return $this;
+    }
+
+    public function getDate(): ?\DateTimeInterface
+    {
+        return $this->date;
+    }
+
+    public function setDate(\DateTimeInterface $date): static
+    {
+        $this->date = $date;
+
+        return $this;
+    }
+
+    public function getDeviceManager(): ?DeviceManager
+    {
+        return $this->DeviceManager;
+    }
+
+    public function setDeviceManager(?DeviceManager $DeviceManager): static
+    {
+        $this->DeviceManager = $DeviceManager;
 
         return $this;
     }

@@ -78,38 +78,19 @@ class DeviceRepository extends ServiceEntityRepository
         }
     }
 
-    public function generateRandomYield($device, $period)
-    {
-        $value = rand(0, 1000);
-        $deviceYield = [
-            'device' => $device,
-            'period' => $period,
-            'amount' => $value
-        ];
-
-        $deviceYieldRep = $this->getEntityManager()->getRepository(DeviceYield::class);
-        $deviceYieldRep->saveDeviceYield($deviceYield);
-    }
-
-    public function generateRandomSurplus($device, $period)
-    {
-        $value = rand(-1000, 1000);
-        $deviceSurplus = [
-            'device' => $device,
-            'period' => $period,
-            'amount' => $value
-        ];
-        $deviceSurplusRep = $this->getEntityManager()->getRepository(DeviceSurplus::class);
-        $deviceSurplusRep->saveDeviceSurplus($deviceSurplus);
-    }
-
-    public function generateRandomYieldAndSurplus($deviceId, $period)
+    public function generateRandomYield($deviceId)
     {
         $device = $this->fetch($deviceId);
         if($device)
         {
-            $this->generateRandomYield($device, $period);
-            $this->generateRandomSurplus($device, $period);
+            $value = rand(0, 1000);
+            $deviceYield = [
+                'device' => $device,
+                'amount' => $value
+            ];
+    
+            $deviceYieldRep = $this->getEntityManager()->getRepository(DeviceYield::class);
+            $deviceYieldRep->saveDeviceYield($deviceYield);
             return true;
         }
         return false;

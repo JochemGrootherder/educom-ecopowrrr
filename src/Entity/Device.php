@@ -52,12 +52,6 @@ class Device
     #[ORM\OneToMany(targetEntity: DeviceYield::class, mappedBy: 'Device', orphanRemoval: true)]
     private Collection $deviceYields;
 
-    /**
-     * @var Collection<int, DeviceSurplus>
-     */
-    #[ORM\OneToMany(targetEntity: DeviceSurplus::class, mappedBy: 'Device', orphanRemoval: true)]
-    private Collection $deviceSurpluses;
-
     public function __construct()
     {
         $this->deviceYields = new ArrayCollection();
@@ -105,29 +99,15 @@ class Device
         return null;
     }
 
-    public function getSurplusUntillPeriod($period)
+    public function getYieldByDate($date)
     {
-        $totalSurplus = 0.0;
-        foreach($this->deviceSurpluses as $surplus)
+        $date = $date->format('Y-m-d');
+        foreach($this->deviceYields as $yield)
         {
-            $surplusPeriod = $surplus->getPeriod();
-            $surplusEndDate = $surplusPeriod->getEndDate();
-            $periodEndDate = $period->getEndDate();
-            if($surplusEndDate <= $periodEndDate)
+            $yieldDate = $yield->getDate()->format('Y-m-d');
+            if($yieldDate === $date)
             {
-                $totalSurplus += $surplus->getAmount();
-            }
-        }
-        return $totalSurplus;
-    }
-
-    public function getPeriodSurplus($period)
-    {
-        foreach($this->deviceSurpluses as $surplus)
-        {
-            if($surplus->getPeriod() === $period)
-            {
-                return $surplus;
+                return $yield;
             }
         }
         return null;
@@ -209,36 +189,6 @@ class Device
             // set the owning side to null (unless already changed)
             if ($deviceYield->getDevice() === $this) {
                 $deviceYield->setDevice(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, DeviceSurplus>
-     */
-    public function getDeviceSurpluses(): Collection
-    {
-        return $this->deviceSurpluses;
-    }
-
-    public function addDeviceSurplus(DeviceSurplus $deviceSurplus): static
-    {
-        if (!$this->deviceSurpluses->contains($deviceSurplus)) {
-            $this->deviceSurpluses->add($deviceSurplus);
-            $deviceSurplus->setDevice($this);
-        }
-
-        return $this;
-    }
-
-    public function removeDeviceSurplus(DeviceSurplus $deviceSurplus): static
-    {
-        if ($this->deviceSurpluses->removeElement($deviceSurplus)) {
-            // set the owning side to null (unless already changed)
-            if ($deviceSurplus->getDevice() === $this) {
-                $deviceSurplus->setDevice(null);
             }
         }
 

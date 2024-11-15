@@ -30,7 +30,7 @@ class CreateMessageCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addArgument('deviceManagerId', InputArgument::REQUIRED, 'Device manager id to which the device will be added')
+            ->addArgument('deviceManagerId', InputArgument::REQUIRED, 'Device manager id of which the message will be created')
         ;
     }
 

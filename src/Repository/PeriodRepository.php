@@ -110,6 +110,18 @@ class PeriodRepository extends ServiceEntityRepository
         return $query->getResult();
     }
 
+    public function getDatePeriod($date)
+    {
+        $qb = $this->createQueryBuilder('p')
+        ->where('p.startDate >= :date')
+        ->andWhere('p.endDate <= :date')
+        ->setParameter('date', $date);
+
+        $query = $qb->getQuery();
+
+        return $query->getSingleResult();
+    }
+
     
     //    /**
     //     * @return Period[] Returns an array of Period objects

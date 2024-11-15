@@ -27,16 +27,15 @@ class DeviceYield
     #[Assert\Uuid]
     private ?int $id = null;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Period $Period = null;
-
     #[ORM\ManyToOne(inversedBy: 'deviceYields')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Device $Device = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     private ?string $amount = null;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    private ?\DateTimeInterface $date = null;
     
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
@@ -52,18 +51,6 @@ class DeviceYield
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getPeriod(): ?Period
-    {
-        return $this->Period;
-    }
-
-    public function setPeriod(?Period $Period): static
-    {
-        $this->Period = $Period;
-
-        return $this;
     }
 
     public function getDevice(): ?Device
@@ -86,6 +73,18 @@ class DeviceYield
     public function setAmount(string $amount): static
     {
         $this->amount = $amount;
+
+        return $this;
+    }
+
+    public function getDate(): ?\DateTimeInterface
+    {
+        return $this->date;
+    }
+
+    public function setDate(\DateTimeInterface $date): static
+    {
+        $this->date = $date;
 
         return $this;
     }

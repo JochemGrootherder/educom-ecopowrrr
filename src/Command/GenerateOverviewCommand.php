@@ -115,27 +115,17 @@ class GenerateOverviewCommand extends Command
             $deviceManager = $customer->getDeviceManager();
             $devices = $deviceManager->getDevices();
 
-            $yields =[];
-            $surpluses = [];
+            $totalYield = 0.0;
             foreach($devices as $device)
             {
                 foreach($device->getDeviceYields() as $yield)
                 {
-                    $yields[] = $yield;
-                }
-                foreach($device->getDeviceSurpluses() as $surplus)
-                {
-                    $surpluses[] = $surplus;
+                    $totalYield += $yield->getAmount();
                 }
             }
-
-            $totalYield = 0.0;
-            foreach($yields as $yield)
-            {
-                $totalYield += $yield->getAmount();
-            }
-
+            
             $totalSurplus = 0.0;
+            $surpluses = $deviceManager->getSurpluses();
             foreach($surpluses as $surplus)
             {
                 $totalSurplus += $surplus->getAmount();
@@ -166,25 +156,25 @@ class GenerateOverviewCommand extends Command
             $deviceManager = $customer->getDeviceManager();
             $devices = $deviceManager->getDevices();
 
-            $surpluses = [];
-            $totalRevenues = [];
-            $totalSurplus = 0.0;
-            foreach($devices as $device)
+            $surplusesToCalculate = [];
+            $surpluses = $deviceManager->getSurpluses();
+            foreach($surpluses as $surplus)
             {
-                $deviceSurpluses = $device->getDeviceSurpluses();
-                foreach($deviceSurpluses as $deviceSurplus)
+                foreach($periods as $period)
                 {
-                    foreach($periods as $period)
+                    $periodStartDate = $period->getStartDate();
+                    $periodEndDate = $period->getEndDate();
+                    $surplusDate = $surplus->getDate();
+
+                    if($surplusDate >= $periodStartDate
+                    && $surplusDate <= $periodEndDate)
                     {
-                        if($deviceSurplus->getPeriod() == $period)
-                        {
-                            $surpluses[] = $deviceSurplus;
-                            break;
-                        }
+                        $surplusesToCalculate[] = $surplus;
+                        break;
                     }
                 }
             }
-            $this->calculateRevenuePerPeriod($revenues, $surpluses, $prices);
+            $this->calculateRevenuePerPeriod($revenues, $surplusesToCalculate, $prices);
         }
         sort($revenues);
         return $revenues;
@@ -199,37 +189,38 @@ class GenerateOverviewCommand extends Command
         $periods = $periodRep->getYearPeriods($year);
 
         $revenues = [];
-
+        $a = 0.0;
         $customers = $customerRep->fetchAll();
         foreach($customers as $customer)
         {
             $prices = $priceRep->getPricesByCustomerDesc($customer);
             $deviceManager = $customer->getDeviceManager();
-            $devices = $deviceManager->getDevices();
             
-            $surpluses = [];
+            $surplusesToCalculate = [];
             $totalRevenues = [];
             $totalSurplus = 0.0;
-            foreach($devices as $device)
+            $surpluses = $deviceManager->getSurpluses();
+            foreach($surpluses as $surplus)
             {
-                $deviceSurpluses = $device->getDeviceSurpluses();
-                foreach($deviceSurpluses as $deviceSurplus)
+                foreach($periods as $period)
                 {
-                    foreach($periods as $period)
+                    $periodStartDate = $period->getStartDate();
+                    $periodEndDate = $period->getEndDate();
+                    $surplusDate = $surplus->getDate();
+                    if($surplusDate >= $periodStartDate
+                    && $surplusDate <= $periodEndDate)
                     {
-                        if($deviceSurplus->getPeriod() == $period)
-                        {
-                            $surpluses[] = $deviceSurplus;
-                            $totalSurplus += $deviceSurplus->getAmount();
-                            break;
-                        }
+                        $surplusesToCalculate[] = $surplus;
+                        $totalSurplus += $surplus->getAmount();
+                        break;
                     }
                 }
             }
+            $a += $totalSurplus;
             $customerRevenues = [
                 "customer" => $customer,
                 "surplus" => $totalSurplus, 
-                "revenue" => $this->calculateRevenue($surpluses, $prices)];
+                "revenue" => $this->calculateRevenue($surplusesToCalculate, $prices)];
             $revenues[] = $customerRevenues;
         }
         sort($revenues);
@@ -238,26 +229,38 @@ class GenerateOverviewCommand extends Command
 
     private function calculateRevenuePerPeriod(&$revenues, $surpluses, $prices)
     {
+        $periodRep = $this->doctrine->getRepository(Period::class);
         foreach($surpluses as $surplus)
         {
             $surplusArr[] = $surplus;
-            $periodId = $surplus->getPeriod()->getId();
+            $surplusDate = $surplus->getDate();
             $addedToRevenue = false;
             foreach($revenues as &$revenue)
             {
-                if($revenue['period_id'] == $periodId)
+                $period = $periodRep->fetch($revenue['period_id']);
+                if($period)
                 {
-                    $revenue['surplus'] = $revenue['surplus'] + $surplus->getAmount();
-                    $revenue['revenue'] = $revenue['revenue'] + $this->calculateRevenue($surplusArr, $prices);
-                    $addedToRevenue = true;
+                    $periodStartDate= $period->getStartDate();
+                    $periodEndDate= $period->getEndDate();
+                    if($surplusDate >= $periodStartDate
+                    && $surplusDate <= $periodEndDate)
+                    {
+                        $revenue['surplus'] = $revenue['surplus'] + $surplus->getAmount();
+                        $revenue['revenue'] = $revenue['revenue'] + $this->calculateRevenue($surplusArr, $prices);
+                        $addedToRevenue = true;
+                    }
                 }
             }
+            //There is no revenue with this period yet
             if(!$addedToRevenue)
             {
+                $period = $periodRep->getDatePeriod($surplusDate);
+                $periodId = $period->getId();
                 $revenues[] = ['period_id' => $periodId,
                     "surplus" => $surplus->getAmount(),
                     "revenue" => $this->calculateRevenue($surplusArr, $prices)
                 ];
+                
             }
         }
         return $revenues;
@@ -268,16 +271,15 @@ class GenerateOverviewCommand extends Command
         foreach($surpluses as $surplus)
         {
             $amount = $surplus->getAmount();
-            $period = $surplus->getPeriod();
+            $surplusDate = $surplus->getDate();
             
             $revenueAdded = false;
             $revenue = 0.0;
             foreach($prices as $price)
             {
                 //if price date is within period
-                if($price->getDate() >= $period->getStartDate()
-                && $price->getDate() <= $period->getEndDate()
-                &&!$revenueAdded)
+                if($price->getDate() <= $surplusDate
+                && !$revenueAdded)
                 {
                     $revenue += $amount * $price->getPrice();
                     $revenueAdded = true;

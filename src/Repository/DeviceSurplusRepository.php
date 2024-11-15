@@ -6,8 +6,7 @@ use App\Entity\DeviceSurplus;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-use App\Entity\Device;
-use App\Entity\Period;
+use App\Entity\DeviceManager;
 
 /**
  * @extends ServiceEntityRepository<DeviceSurplus>
@@ -21,36 +20,38 @@ class DeviceSurplusRepository extends ServiceEntityRepository
 
     public function saveDeviceSurplus($params)
     {
-        if(!empty($params['device_id']))
+        if(!empty($params['device_manager_id']))
         {
-            $deviceRep = $this->getEntityManager()->getRepository(Device::class);
-            $device = $deviceRep->fetch($params['device_id']);
+            $deviceManagerRep = $this->getEntityManager()->getRepository(DeviceManager::class);
+            $deviceManager = $deviceManagerRep->fetch($params['device_manager_id']);
         }
         else
         {
-            $device = $params['device'];
+            $deviceManager = $params['deviceManager'];
         }
-        if(!empty($params['period_id']))
+        if(!empty($params['date']))
         {
-            $periodRep = $this->getEntityManager()->getRepository(Period::class);
-            $period = $periodRep->fetch($params['period_id']);
+            $date = $params['date'];
+            $date = date_create_from_format("Y-m-d", $date);
         }
         else
         {
-            $period = $params['period'];
+            $currentDate = date('Y-m-d');
+            $date = date_create_from_format("Y-m-d", $currentDate);
         }
-
+        
+        $date->settime(0,0);
         $amount = $params['amount'];
-        $deviceSurplus = $this->fetchByDeviceAndPeriod($device, $period);
+        $deviceSurplus = $deviceManager->getSurplusByDate($date);
         if(empty($deviceSurplus))
         {
             $deviceSurplus = new DeviceSurplus();
-            $deviceSurplus->setDevice($device);
-            $deviceSurplus->setPeriod($period);
+            $deviceSurplus->setDeviceManager($deviceManager);
+            $deviceSurplus->setDate($date);
         }
         $deviceSurplus->setAmount($deviceSurplus->getAmount() + $amount);
 
-        $device->addDeviceSurplus($deviceSurplus);
+        $deviceManager->addSurplus($deviceSurplus);
 
         $this->getEntityManager()->persist($deviceSurplus);
         $this->getEntityManager()->flush();
@@ -65,19 +66,19 @@ class DeviceSurplusRepository extends ServiceEntityRepository
             $surplus = 
             [
                 "id" => (int)$values["id"],
-                "device_id" => $values["device_id"],
-                "period_id" => $values["period_id"],
+                "device_manager_id" => $values["device_manager_id"],
+                "date" => $values["date"],
                 "amount" => $values["amount"]
             ];
             $this->saveDeviceSurplus($surplus);
         }
     }
 
-    public function fetchByDeviceAndPeriod($device, $period)
+    /*public function fetchByDeviceAndPeriod($device, $period)
     {
         $result = $this->findOneBy(["Device" => $device, "Period" => $period]);
         return $result;
-    }
+    }*/
     //    /**
     //     * @return DeviceSurplus[] Returns an array of DeviceSurplus objects
     //     */

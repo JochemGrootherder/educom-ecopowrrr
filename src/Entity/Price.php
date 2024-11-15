@@ -29,7 +29,7 @@ class Price
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Customer $customer = null;
+    private ?Customer $Customer = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 8, scale: 2)]
     private ?string $price = null;
@@ -44,7 +44,7 @@ class Price
             'max' => 999,
         ]));
         $metadata->addPropertyConstraint('price', new NotBlank());
-        $metadata->addPropertyConstraint('customer', new NotBlank());
+        $metadata->addPropertyConstraint('Customer', new NotBlank());
         $metadata->addPropertyConstraint('date', new NotBlank());
         $metadata->addPropertyConstraint('date', new Assert\Date());
     }
@@ -56,12 +56,12 @@ class Price
 
     public function getCustomer(): ?Customer
     {
-        return $this->customer;
+        return $this->Customer;
     }
 
-    public function setCustomer(?Customer $customer): static
+    public function setCustomer(?Customer $Customer): static
     {
-        $this->customer = $customer;
+        $this->Customer = $Customer;
 
         return $this;
     }

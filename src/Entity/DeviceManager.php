@@ -42,9 +42,16 @@ class DeviceManager
     #[ORM\JoinColumn(nullable: false)]
     private ?Customer $Customer = null;
 
+    /**
+     * @var Collection<int, DeviceSurplus>
+     */
+    #[ORM\OneToMany(targetEntity: DeviceSurplus::class, mappedBy: 'DeviceManager')]
+    private Collection $surpluses;
+
     public function __construct()
     {
         $this->devices = new ArrayCollection();
+        $this->surpluses = new ArrayCollection();
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -52,6 +59,51 @@ class DeviceManager
         $metadata->addPropertyConstraint('status', new NotBlank());
         $metadata->addPropertyConstraint('Customer', new NotBlank());
     }
+
+    public function getSurplusUntillPeriod($period)
+    {
+        $totalSurplus = 0.0;
+        foreach($this->surpluses as $surplus)
+        {
+            $surplusPeriod = $surplus->getPeriod();
+            $surplusEndDate = $surplusPeriod->getEndDate();
+            $periodEndDate = $period->getEndDate();
+            if($surplusEndDate <= $periodEndDate)
+            {
+                $totalSurplus += $surplus->getAmount();
+            }
+        }
+        return $totalSurplus;
+    }
+
+    public function getPeriodSurplus($startDate, $endDate)
+    {
+        $periodSurplus = 0.0;
+        foreach($this->surpluses as $surplus)
+        {
+            $surplusDate = $surplus->getDate();
+            if($surplusDate >= $startDate && $surplusDate <= $endDate)
+            {
+                $periodSurplus += $surplus->getAmount();
+            }
+        }
+        return $periodSurplus;
+    }
+
+    public function getSurplusByDate($date)
+    {
+        $date = $date->format('Y-m-d');
+        foreach($this->surpluses as $surplus)
+        {
+            $surplusDate = $surplus->getDate()->format('Y-m-d');
+            if($surplusDate === $date)
+            {
+                return $surplus;
+            }
+        }
+        return null;
+    }
+
 
     public function getId(): ?int
     {
@@ -108,6 +160,36 @@ class DeviceManager
     public function setCustomer(Customer $Customer): static
     {
         $this->Customer = $Customer;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, DeviceSurplus>
+     */
+    public function getSurpluses(): Collection
+    {
+        return $this->surpluses;
+    }
+
+    public function addSurplus(DeviceSurplus $surplus): static
+    {
+        if (!$this->surpluses->contains($surplus)) {
+            $this->surpluses->add($surplus);
+            $surplus->setDeviceManager($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSurplus(DeviceSurplus $surplus): static
+    {
+        if ($this->surpluses->removeElement($surplus)) {
+            // set the owning side to null (unless already changed)
+            if ($surplus->getDeviceManager() === $this) {
+                $surplus->setDeviceManager(null);
+            }
+        }
 
         return $this;
     }

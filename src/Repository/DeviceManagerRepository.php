@@ -65,6 +65,29 @@ class DeviceManagerRepository extends ServiceEntityRepository
             $this->saveDeviceManager($DeviceManager);
         }
     }
+    
+    public function generateRandomSurplus($deviceManagerId)
+    {
+        $deviceManager = $this->fetch($deviceManagerId);
+        if($deviceManager)
+        {
+            $currentDate = date('Y-m-d');
+            $startDate = date_create_from_format("Y-m-d", $currentDate);
+            $endDate = date_create_from_format("Y-m-d", $currentDate);
+            $startDate->settime(0,0);
+            $endDate->settime(0,0);
+            $max = $deviceManager->getPeriodYield($startDate, $endDate);
+            $value = rand(-1000, $max);
+            $surplus = [
+                'deviceManager' => $deviceManager,
+                'amount' => $value
+            ];
+            $surplusRep = $this->getEntityManager()->getRepository(DeviceSurplus::class);
+            $surplusRep->saveDeviceSurplus($surplus);
+            return true;
+        }
+        return false;
+    }
 
 //    /**
 //     * @return DeviceManager[] Returns an array of DeviceManager objects
