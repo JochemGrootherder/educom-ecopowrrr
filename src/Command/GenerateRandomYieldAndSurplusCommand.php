@@ -11,8 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Doctrine\Persistence\ManagerRegistry;
 
-use App\Entity\Device;
-use App\Entity\Period;
+use App\Entity\DeviceManager;
 
 #[AsCommand(
     name: 'GenerateRandomYieldAndSurplus',
@@ -30,27 +29,25 @@ class GenerateRandomYieldAndSurplusCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addArgument('deviceId', InputArgument::REQUIRED, 'Device id of which random values should be generated')
+            ->addArgument('deviceManagerId', InputArgument::REQUIRED, 'Device manager id of which random values should be generated')
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $deviceId = $input->getArgument('deviceId');
+        $deviceManagerId = $input->getArgument('deviceManagerId');
 
-        $deviceRep = $this->doctrine->getRepository(Device::class);
+        $deviceManagerRep = $this->doctrine->getRepository(DeviceManager::class);
         
-        $periodRep = $this->doctrine->getRepository(Period::class);
-        $period = $periodRep->getCurrentPeriod();
-        $result = $deviceRep->generateRandomYieldAndSurplus($deviceId, $period);
+        $result = $deviceManagerRep->generateRandomSurplus($deviceManagerId);
         
         if(!$result)
         {
-            $io->error('Failed to generate random yield and surplus for device id: '. $deviceId . '. Device does not exist');
+            $io->error('Failed to generate random yield and surplus for device id: '. $deviceManagerId . '. Device does not exist');
             return Command::FAILURE;
         }
-        $io->success('Succesfully generated random yield and surplus for device id: '. $deviceId);
+        $io->success('Succesfully generated random yield and surplus for device id: '. $deviceManagerId);
         return Command::SUCCESS;
     }
 }

@@ -9,6 +9,8 @@ use Doctrine\Persistence\ManagerRegistry;
 use App\Repository\DeviceStatusRepository;
 
 use App\Entity\DeviceStatus;
+use App\Entity\Device;
+use App\Entity\DeviceSurplus;
 use App\Entity\Customer;
 
 
@@ -71,6 +73,12 @@ class DeviceManagerRepository extends ServiceEntityRepository
         $deviceManager = $this->fetch($deviceManagerId);
         if($deviceManager)
         {
+            foreach($deviceManager->getDevices() as $device)
+            {
+                $deviceRep = $this->getEntityManager()->getRepository(Device::class);
+                $deviceRep->generateRandomYield($device->getId());
+            }
+
             $currentDate = date('Y-m-d');
             $startDate = date_create_from_format("Y-m-d", $currentDate);
             $endDate = date_create_from_format("Y-m-d", $currentDate);
@@ -83,7 +91,7 @@ class DeviceManagerRepository extends ServiceEntityRepository
                 'amount' => $value
             ];
             $surplusRep = $this->getEntityManager()->getRepository(DeviceSurplus::class);
-            $surplusRep->saveDeviceSurplus($surplus);
+            $result = $surplusRep->saveDeviceSurplus($surplus);
             return true;
         }
         return false;

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Message\Device;
+namespace App\Message;
 
-Class MessageDevice
+Class MessageDevice implements \JsonSerializable 
 {
     private string $serialNumber;
     private string $deviceType;
@@ -15,6 +15,18 @@ Class MessageDevice
         
     }
 
+	
+
+    public function jsonSerialize()
+    {
+        return [
+			'serial_number' => $this->serialNumber,
+            'device_type' => $this->deviceType,
+            'device_status' => $this->deviceStatus,	
+            'device_total_yield' => $this->deviceTotalYield,
+            'device_period_yield' => $this->devicePeriodYield,
+        ];
+    }
 	/**
 	 * Get the value of serialNumber
 	 *

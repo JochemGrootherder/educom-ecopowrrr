@@ -1,79 +1,109 @@
 <?php
 
-namespace App\Message\Content;
+namespace App\Message;
 
-class MessageContent
+use App\Entity\Device;
+use App\Message\MessageDevice;
+use Doctrine\DBAL\Types\Types;
+
+class MessageContent implements \JsonSerializable
 {
-    private string $message_id;
-    private int $device_id;
-    private string $device_status;
-    private string $date;
-    private int $total_usage;
+    private string $messageId;
+    private int $deviceId;
+    private string $deviceStatus;
+    private \DateTimeInterface $startDate;
+    private \DateTimeInterface $endDate;
+    private int $totalUsage;
     private array $devices;
 
     public function __construct()
     {
+        $this->messageId = "test";
+    }
 
+    public function jsonSerialize()
+    {
+        return [
+            'message_id' => $this->messageId,
+            'device_id' => $this->deviceId,
+            'device_status' => $this->deviceStatus,
+            'start_date' => $this->startDate->format('Y-m-d'),
+            'end_date' => $this->endDate->format('Y-m-d'),	
+            'total_usage' => $this->totalUsage,
+            'devices' => $this->devices,
+        ];
+    }
+
+    public function createMessageDevice(Device $device)
+    {
+        $messageDevice = new MessageDevice();
+        $messageDevice->setSerialNumber($device->getSerialNumber());
+        $messageDevice->setDeviceStatus($device->getDeviceStatus()->getName());
+        $messageDevice->setDeviceType($device->getDeviceType()->getName());
+        $messageDevice->setDeviceTotalYield($device->getYieldUntillDate($this->endDate));
+        $messageDevice->setDevicePeriodYield($device->getPeriodYield($this->startDate, $this->endDate));
+
+        $this->devices[] = $messageDevice;
     }
 
 	/**
-	 * Get the value of message_id
+	 * Get the value of messageId
 	 *
 	 * @return  mixed
 	 */
-	public function getMessage_id()
+	public function getMessageId()
 	{
-		return $this->message_id;
+		return $this->messageId;
 	}
 
 	/**
-	 * Set the value of message_id
+	 * Set the value of messageId
 	 *
-	 * @param   mixed  $message_id  
+	 * @param   mixed  $messageId  
 	 */
-	public function setMessage_id($message_id)
+	public function setMessageId($messageId)
 	{
-		$this->message_id = $message_id;
+		$this->messageId = $messageId;
 	}
 
 	/**
-	 * Get the value of device_id
-	 *
-	 * @return  mixed
-	 */
-	public function getDevice_id()
-	{
-		return $this->device_id;
-	}
-
-	/**
-	 * Set the value of device_id
-	 *
-	 * @param   mixed  $device_id  
-	 */
-	public function setDevice_id($device_id)
-	{
-		$this->device_id = $device_id;
-	}
-
-	/**
-	 * Get the value of device_status
+	 * Get the value of deviceId
 	 *
 	 * @return  mixed
 	 */
-	public function getDevice_status()
+	public function getDeviceId()
 	{
-		return $this->device_status;
+		return $this->deviceId;
 	}
 
 	/**
-	 * Set the value of device_status
+	 * Set the value of deviceId
 	 *
-	 * @param   mixed  $device_status  
+	 * @param   mixed  $deviceId  
 	 */
-	public function setDevice_status($device_status)
+	public function setDeviceId($deviceId)
 	{
-		$this->device_status = $device_status;
+		$this->deviceId = $deviceId;
+	}
+
+	/**
+	 * Get the value of deviceStatus
+	 *
+	 * @return  mixed
+	 */
+	public function getDeviceStatus()
+	{
+		return $this->deviceStatus;
+	}
+
+	/**
+	 * Set the value of deviceStatus
+	 *
+	 * @param   mixed  $deviceStatus  
+	 */
+	public function setDeviceStatus($deviceStatus)
+	{
+		$this->deviceStatus = $deviceStatus;
 	}
 
 	/**
@@ -81,9 +111,9 @@ class MessageContent
 	 *
 	 * @return  mixed
 	 */
-	public function getDate()
+	public function getStartDate()
 	{
-		return $this->date;
+		return $this->startDate;
 	}
 
 	/**
@@ -91,29 +121,49 @@ class MessageContent
 	 *
 	 * @param   mixed  $date  
 	 */
-	public function setDate($date)
+	public function setStartDate($date)
 	{
-		$this->date = $date;
+		$this->startDate = $date;
 	}
 
 	/**
-	 * Get the value of total_usage
+	 * Get the value of date
 	 *
 	 * @return  mixed
 	 */
-	public function getTotal_usage()
+	public function getEndDate()
 	{
-		return $this->total_usage;
+		return $this->endDate;
 	}
 
 	/**
-	 * Set the value of total_usage
+	 * Set the value of date
 	 *
-	 * @param   mixed  $total_usage  
+	 * @param   mixed  $date  
 	 */
-	public function setTotal_usage($total_usage)
+	public function setEndDate($date)
 	{
-		$this->total_usage = $total_usage;
+		$this->endDate = $date;
+	}
+
+	/**
+	 * Get the value of totalUsage
+	 *
+	 * @return  mixed
+	 */
+	public function getTotalUsage()
+	{
+		return $this->totalUsage;
+	}
+
+	/**
+	 * Set the value of totalUsage
+	 *
+	 * @param   mixed  $totalUsage  
+	 */
+	public function setTotalUsage($totalUsage)
+	{
+		$this->totalUsage = $totalUsage;
 	}
 
 	/**

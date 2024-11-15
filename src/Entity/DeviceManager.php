@@ -13,6 +13,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+use App\Message\MessageContent;
+
 #[ORM\Entity(repositoryClass: DeviceManagerRepository::class)]
 #[ApiResource]
 #[Delete]
@@ -89,6 +91,16 @@ class DeviceManager
         }
         return $periodSurplus;
     }
+    
+        public function getPeriodYield($startDate, $endDate)
+        {
+            $totalYield = 0.0;
+            foreach($this->devices as $device)
+            {
+                $totalYield += $device->getPeriodYield($startDate, $endDate);
+            }
+            return $totalYield;
+        }
 
     public function getSurplusByDate($date)
     {
@@ -104,6 +116,28 @@ class DeviceManager
         return null;
     }
 
+    public function createMessage($startDate, $endDate)
+    {
+        $messageContent = new MessageContent(); 
+        $messageContent->setDeviceId($this->id);
+        $messageContent->setDeviceStatus($this->status->getName());
+        $messageContent->setStartDate($startDate);
+        $messageContent->setEndDate($endDate);
+        $messageContent->setTotalUsage($this->calculateTotalPeriodUsage($startDate, $endDate));
+        foreach($this->devices as $device)
+        {
+            $messageContent->createMessageDevice($device);
+        }
+        return json_encode($messageContent, JSON_PRETTY_PRINT);
+    }
+
+    private function calculateTotalPeriodUsage($startDate, $endDate)
+    {
+        $totalSurplus = $this->getPeriodSurplus($startDate, $endDate);        
+        $totalYield = $this->getPeriodYield($startDate, $endDate);
+
+        return $totalYield - $totalSurplus;
+    }
 
     public function getId(): ?int
     {

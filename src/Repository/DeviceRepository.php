@@ -90,7 +90,8 @@ class DeviceRepository extends ServiceEntityRepository
             ];
     
             $deviceYieldRep = $this->getEntityManager()->getRepository(DeviceYield::class);
-            $deviceYieldRep->saveDeviceYield($deviceYield);
+            $result = $deviceYieldRep->saveDeviceYield($deviceYield);
+            dump($result->getAmount());
             return true;
         }
         return false;

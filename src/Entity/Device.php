@@ -71,15 +71,13 @@ class Device
         $metadata->addPropertyConstraint('deviceStatus', new NotBlank());
     }
 
-    public function getYieldUntillPeriod($period)
+    public function getYieldUntillDate($date)
     {
         $totalYield = 0.0;
         foreach($this->deviceYields as $yield)
         {
-            $yieldPeriod = $yield->getPeriod();
-            $yieldEndDate = $yieldPeriod->getEndDate();
-            $periodEndDate = $period->getEndDate();
-            if($yieldEndDate <= $periodEndDate)
+            $yieldDate = $yield->getDate();
+            if($yieldDate <= $date)
             {
                 $totalYield += $yield->getAmount();
             }
@@ -87,16 +85,19 @@ class Device
         return $totalYield;
     }
 
-    public function getPeriodYield($period)
+    public function getPeriodYield($startDate, $endDate)
     {
+        $totalYield = 0.0;
         foreach($this->deviceYields as $yield)
         {
-            if($yield->getPeriod() === $period)
+            $yieldDate = $yield->getDate();
+            if($yieldDate >= $startDate
+            && $yieldDate <= $endDate)
             {
-                return $yield;
+                $totalYield += $yield->getAmount();
             }
         }
-        return null;
+        return $totalYield;
     }
 
     public function getYieldByDate($date)

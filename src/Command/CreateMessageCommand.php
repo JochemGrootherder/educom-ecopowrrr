@@ -41,9 +41,15 @@ class CreateMessageCommand extends Command
 
         $deviceManagerRep = $this->doctrine->getRepository(DeviceManager::class);
         $deviceManager = $deviceManagerRep->fetch($deviceManagerId);
+        $startDate = "2024-11-01";
+        $endDate = "2024-11-30";
+        $startDate = date_create_from_format("Y-m-d", $startDate);
+        $endDate = date_create_from_format("Y-m-d", $endDate);
+        $message = $deviceManager->createMessage($startDate, $endDate);
+        dump($message);
 
-        $messageRep = $this->doctrine->getRepository(Message::class);
-        $message = $messageRep->createMessage($deviceManager);
+        /*$messageRep = $this->doctrine->getRepository(Message::class);
+        $message = $messageRep->createMessage($deviceManager);*/
 
         $io->success('Message created successfully');
 
