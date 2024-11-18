@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiResource;
 use App\Repository\DeviceManagerRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -16,18 +15,11 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 use App\Message\MessageContent;
 
 #[ORM\Entity(repositoryClass: DeviceManagerRepository::class)]
-#[ApiResource]
-#[Delete]
-#[Get]
-#[Put(validationContext: [])]
-#[GetCollection]
-#[Post(validationContext: [])]
 class DeviceManager
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Assert\Uuid]
     private ?int $id = null;
 
     #[ORM\ManyToOne]

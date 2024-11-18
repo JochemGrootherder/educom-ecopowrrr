@@ -2,29 +2,17 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiResource;
 use App\Repository\PriceRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
-
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
-
 #[ORM\Entity(repositoryClass: PriceRepository::class)]
-#[ApiResource]
-#[Delete]
-#[Get]
-#[Put(validationContext: [])]
-#[GetCollection]
-#[Post(validationContext: [])]
 class Price
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Assert\Uuid]
     private ?int $id = null;
 
     #[ORM\ManyToOne]
@@ -36,18 +24,6 @@ class Price
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $date = null;
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('price', new Assert\Range([
-            'min' => -999,
-            'max' => 999,
-        ]));
-        $metadata->addPropertyConstraint('price', new NotBlank());
-        $metadata->addPropertyConstraint('Customer', new NotBlank());
-        $metadata->addPropertyConstraint('date', new NotBlank());
-        $metadata->addPropertyConstraint('date', new Assert\Date());
-    }
 
     public function getId(): ?int
     {

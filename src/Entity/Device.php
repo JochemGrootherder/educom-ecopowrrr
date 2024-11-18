@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiResource;
 use App\Repository\DeviceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -11,22 +10,12 @@ use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraints as Assert;
 
 
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
-
 #[ORM\Entity(repositoryClass: DeviceRepository::class)]
-#[ApiResource]
-#[Delete]
-#[Get]
-#[Put(validationContext: [])]
-#[GetCollection]
-#[Post(validationContext: [])]
 class Device
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Assert\Uuid]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'devices')]
@@ -38,12 +27,10 @@ class Device
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Assert\NotBlank()]
     private ?DeviceType $deviceType = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Assert\NotBlank()]
     private ?DeviceStatus $deviceStatus = null;
 
     /**
@@ -57,20 +44,7 @@ class Device
         $this->deviceYields = new ArrayCollection();
         $this->deviceSurpluses = new ArrayCollection();
     }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('serialNumber', new Assert\Length([
-            'min' => 1,
-            'max' => 80,
-            'minMessage' => 'Your last name must be at least {{ limit }} characters long',
-            'maxMessage' => 'Your last name cannot be longer than {{ limit }} characters',
-        ]));
-        $metadata->addPropertyConstraint('serialNumber', new NotBlank());
-        $metadata->addPropertyConstraint('deviceType', new NotBlank());
-        $metadata->addPropertyConstraint('deviceStatus', new NotBlank());
-    }
-
+    
     public function getYieldUntillDate($date)
     {
         $totalYield = 0.0;
