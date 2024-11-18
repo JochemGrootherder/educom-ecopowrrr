@@ -43,8 +43,8 @@ class DeviceYield
             'min' => 0,
             'max' => 99999,
         ]));
-        $metadata->addPropertyConstraint('Period', new NotBlank());
-        $metadata->addPropertyConstraint('device', new NotBlank());
+        $metadata->addPropertyConstraint('date', new NotBlank());
+        $metadata->addPropertyConstraint('Device', new NotBlank());
         $metadata->addPropertyConstraint('amount', new NotBlank());
     }
 

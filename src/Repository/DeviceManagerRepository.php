@@ -34,8 +34,14 @@ class DeviceManagerRepository extends ServiceEntityRepository
         {
             $deviceManager = new DeviceManager();
         }
-        $customerRep = $this->getEntityManager()->getRepository(Customer::class);
-        $customer = $customerRep->find($params['customer_id']);
+        if(empty($params['customer_id']))
+        {
+            $customer = $params['customer'];
+        }else
+        {
+            $customerRep = $this->getEntityManager()->getRepository(Customer::class);
+            $customer = $customerRep->find($params['customer_id']);
+        }
         $deviceManager->setCustomer($customer);
 
         $deviceStatusRep = $this->getEntityManager()->getRepository(DeviceStatus::class);

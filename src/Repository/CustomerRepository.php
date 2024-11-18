@@ -76,8 +76,8 @@ class CustomerRepository extends ServiceEntityRepository
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        
-        $headers = array('Authorization: Bearer a055aa49-5445-4395-aded-18aa46d48e08');
+        $postcode_tech_string = 'Authorization: Bearer '. $_ENV['POSTCODE_TECH_KEY'];
+        $headers = array($postcode_tech_string);
 
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
 
