@@ -31,6 +31,8 @@ class CreateMessageCommand extends Command
     {
         $this
             ->addArgument('deviceManagerId', InputArgument::REQUIRED, 'Device manager id of which the message will be created')
+            ->addArgument('startDate', InputArgument::REQUIRED, 'Start date of the period of interest')
+            ->addArgument('endDate', InputArgument::REQUIRED, 'Start date of the period of interest')
         ;
     }
 
@@ -38,21 +40,39 @@ class CreateMessageCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
         $deviceManagerId = $input->getArgument('deviceManagerId');
+        $startDate = $input->getArgument('startDate');
+        $endDate = $input->getArgument('endDate');
 
         $deviceManagerRep = $this->doctrine->getRepository(DeviceManager::class);
         $deviceManager = $deviceManagerRep->fetch($deviceManagerId);
-        $startDate = "2024-11-01";
-        $endDate = "2024-11-30";
         $startDate = date_create_from_format("Y-m-d", $startDate);
         $endDate = date_create_from_format("Y-m-d", $endDate);
         $message = $deviceManager->createMessage($startDate, $endDate);
-        dump($message);
+        $response = $this->sendMessage($message);
+
 
         /*$messageRep = $this->doctrine->getRepository(Message::class);
         $message = $messageRep->createMessage($deviceManager);*/
 
         $io->success('Message created successfully');
+        $io->info($response);
 
         return Command::SUCCESS;
+    }
+
+    private function sendMessage($message)
+    {
+        $url = "http://localhost:8000/DeviceManager/send";
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_POST, true);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Accept: application/json', 'Content-Type: application/json'));
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $message);
+
+        $response = curl_exec($curl);
+        curl_close($curl);
+
+        return $response;
     }
 }
