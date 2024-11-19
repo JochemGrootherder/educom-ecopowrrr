@@ -73,35 +73,6 @@ class DeviceManagerRepository extends ServiceEntityRepository
             $this->saveDeviceManager($DeviceManager);
         }
     }
-    
-    public function generateRandomSurplus($deviceManagerId)
-    {
-        $deviceManager = $this->fetch($deviceManagerId);
-        if($deviceManager)
-        {
-            foreach($deviceManager->getDevices() as $device)
-            {
-                $deviceRep = $this->getEntityManager()->getRepository(Device::class);
-                $deviceRep->generateRandomYield($device->getId());
-            }
-
-            $currentDate = date('Y-m-d');
-            $startDate = date_create_from_format("Y-m-d", $currentDate);
-            $endDate = date_create_from_format("Y-m-d", $currentDate);
-            $startDate->settime(0,0);
-            $endDate->settime(0,0);
-            $max = $deviceManager->getPeriodYield($startDate, $endDate);
-            $value = rand(-1000, $max);
-            $surplus = [
-                'deviceManager' => $deviceManager,
-                'amount' => $value
-            ];
-            $surplusRep = $this->getEntityManager()->getRepository(DeviceSurplus::class);
-            $result = $surplusRep->saveDeviceSurplus($surplus);
-            return true;
-        }
-        return false;
-    }
 
     public function storeMessageData($data)
     {
@@ -122,7 +93,7 @@ class DeviceManagerRepository extends ServiceEntityRepository
             [
                 "deviceManager" => $this->fetch($data['device_id']),
                 "amount" => $surplusAmount,
-                "date" => $data['end_date']
+                "date" => $data['date']
             ];
             $deviceSurplusRep = $this->getEntityManager()->getRepository(DeviceSurplus::class);
             $deviceSurplusRep->saveDeviceSurplus($surplus);

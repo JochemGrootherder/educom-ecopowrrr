@@ -77,25 +77,6 @@ class DeviceRepository extends ServiceEntityRepository
         }
     }
 
-    public function generateRandomYield($deviceId)
-    {
-        $device = $this->fetch($deviceId);
-        if($device)
-        {
-            $value = rand(0, 1000);
-            $deviceYield = [
-                'device' => $device,
-                'amount' => $value
-            ];
-    
-            $deviceYieldRep = $this->getEntityManager()->getRepository(DeviceYield::class);
-            $result = $deviceYieldRep->saveDeviceYield($deviceYield);
-            dump($result->getAmount());
-            return true;
-        }
-        return false;
-    }
-
     public function saveDeviceData($data)
     {
         $deviceManagerId = $data['device_id'];
@@ -121,7 +102,7 @@ class DeviceRepository extends ServiceEntityRepository
             $deviceYieldRep = $this->getEntityManager()->getRepository(DeviceYield::class);
             $deviceYieldParams = [
                 "device" => $device,
-                "date" => $data['end_date'],
+                "date" => $data['date'],
                 "amount" => $deviceData['device_period_yield']
             ];
             $deviceYieldRep->saveDeviceYield($deviceYieldParams);

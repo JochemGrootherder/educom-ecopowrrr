@@ -44,6 +44,26 @@ class Device
         $this->deviceYields = new ArrayCollection();
         $this->deviceSurpluses = new ArrayCollection();
     }
+
+    public function generateRandomYield()
+    {
+        $value = rand(0, 1000);
+        $date = date('Y-m-d');
+        $date = date_create_from_format("Y-m-d", $date);
+        $date->setTime(0,0);
+        
+        $deviceYield = $this->getYieldByDate($date);
+
+        if(!$deviceYield)
+        {
+            $deviceYield = new DeviceYield();
+            $deviceYield->setDevice($this);
+            $deviceYield->setDate($date);
+            $this->addDeviceYield($deviceYield);
+        }
+        $deviceYield->setAmount($value);
+        dump($this->id, $value);
+    }
     
     public function getYieldUntillDate($date)
     {
@@ -65,6 +85,9 @@ class Device
         foreach($this->deviceYields as $yield)
         {
             $yieldDate = $yield->getDate();
+            $yieldDate->setTime(0,0);
+            $startDate->setTime(0,0);
+            $endDate->setTime(0,0);
             if($yieldDate >= $startDate
             && $yieldDate <= $endDate)
             {

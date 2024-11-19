@@ -11,6 +11,7 @@ class MessageContent implements \JsonSerializable
     private string $messageId;
     private int $deviceId;
     private string $deviceStatus;
+    private \DateTimeInterface $date;
     private \DateTimeInterface $startDate;
     private \DateTimeInterface $endDate;
     private int $totalUsage;
@@ -27,6 +28,7 @@ class MessageContent implements \JsonSerializable
             'message_id' => $this->messageId,
             'device_id' => $this->deviceId,
             'device_status' => $this->deviceStatus,
+			'date' => $this->date->format('Y-m-d'),
             'start_date' => $this->startDate->format('Y-m-d'),
             'end_date' => $this->endDate->format('Y-m-d'),	
             'total_usage' => $this->totalUsage,
@@ -191,4 +193,28 @@ class MessageContent implements \JsonSerializable
         $this->devices[] = $device;
         return $this;
     }
+
+	/**
+	 * Get the value of date
+	 *
+	 * @return  mixed
+	 */
+	public function getDate()
+	{
+		return $this->date;
+	}
+
+	/**
+	 * Set the value of date
+	 *
+	 * @param   mixed  $date  
+	 *
+	 * @return  self
+	 */
+	public function setDate($date)
+	{
+		$this->date = $date;
+
+		return $this;
+	}
 }

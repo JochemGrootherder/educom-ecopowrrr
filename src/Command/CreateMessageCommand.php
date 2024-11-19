@@ -45,15 +45,22 @@ class CreateMessageCommand extends Command
 
         $deviceManagerRep = $this->doctrine->getRepository(DeviceManager::class);
         $deviceManager = $deviceManagerRep->fetch($deviceManagerId);
-        $startDate = date_create_from_format("Y-m-d", $startDate);
-        $endDate = date_create_from_format("Y-m-d", $endDate);
-        $message = $deviceManager->createMessage($startDate, $endDate);
-        $response = $this->sendMessage($message);
+        if($deviceManager)
+        {
+            $deviceManager->generateRandomUsage();
+            $startDate = date_create_from_format("Y-m-d", $startDate);
+            $endDate = date_create_from_format("Y-m-d", $endDate);
+            $message = $deviceManager->createMessage($startDate, $endDate);
+            $response = $this->sendMessage($message);
 
-        $io->success('Message created successfully');
-        $io->info($response);
+            $io->success('Message created successfully');
+            $io->info($response);
 
-        return Command::SUCCESS;
+            return Command::SUCCESS;
+        }
+        
+        $io->error('Failed to create message for device id: '. $deviceManagerId . '. Device does not exist');
+        return Command::FAILURE;
     }
 
     private function sendMessage($message)

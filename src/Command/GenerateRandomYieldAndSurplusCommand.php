@@ -39,15 +39,15 @@ class GenerateRandomYieldAndSurplusCommand extends Command
         $deviceManagerId = $input->getArgument('deviceManagerId');
 
         $deviceManagerRep = $this->doctrine->getRepository(DeviceManager::class);
-        
-        $result = $deviceManagerRep->generateRandomSurplus($deviceManagerId);
-        
-        if(!$result)
+        $deviceManager = $deviceManagerRep->fetch($deviceManagerId);
+        if($deviceManager)
         {
-            $io->error('Failed to generate random yield and surplus for device id: '. $deviceManagerId . '. Device does not exist');
-            return Command::FAILURE;
+            $deviceManager->generateRandomUsage();
+            $io->success('Succesfully generated random yield and surplus for device id: '. $deviceManagerId);
+            return Command::SUCCESS;
         }
-        $io->success('Succesfully generated random yield and surplus for device id: '. $deviceManagerId);
-        return Command::SUCCESS;
+        $io->error('Failed to generate random yield and surplus for device id: '. $deviceManagerId . '. Device does not exist');
+        return Command::FAILURE;
+
     }
 }

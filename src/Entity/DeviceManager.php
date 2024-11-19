@@ -8,7 +8,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
-
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -53,6 +52,39 @@ class DeviceManager
         $metadata->addPropertyConstraint('status', new NotBlank());
         $metadata->addPropertyConstraint('Customer', new NotBlank());
     }
+    
+    public function generateRandomUsage()
+    {
+        foreach($this->getDevices() as $device)
+        {
+            if($device->getDeviceStatus()->getName() == "active")
+            {
+                $device->generateRandomYield();
+            }
+        }
+
+        $currentDate = date('Y-m-d');
+        $currentDate = date_create_from_format("Y-m-d", $currentDate);
+        $currentDate->settime(0,0);
+        
+        $periodYield = $this->getPeriodYield($currentDate, $currentDate);
+        $randValue = rand(0, ($periodYield * 2));
+        
+        $surplus = $this->getSurplusByDate($currentDate);
+        //if the surplus doesn't exist, create it
+        if(!$surplus)
+        {
+            $surplus = new DeviceSurplus();
+            $surplus->setDeviceManager($this);
+            $surplus->setAmount(0.0);
+            $surplus->setDate($currentDate);
+            $this->addSurplus($surplus);
+        }
+        $surplusAmount = $surplus->getAmount();
+        $value = $surplus->getAmount() + $randValue;        
+        $surplus->setAmount($value);
+        dump($this->id, $randValue, $value, $surplusAmount);
+    }
 
     public function getSurplusUntillPeriod($period)
     {
@@ -72,10 +104,13 @@ class DeviceManager
 
     public function getPeriodSurplus($startDate, $endDate)
     {
+        $startDate->setTime(0,0);
+        $endDate->setTime(0,0);
         $periodSurplus = 0.0;
         foreach($this->surpluses as $surplus)
         {
             $surplusDate = $surplus->getDate();
+            $surplusDate->setTime(0,0);
             if($surplusDate >= $startDate && $surplusDate <= $endDate)
             {
                 $periodSurplus += $surplus->getAmount();
@@ -113,6 +148,10 @@ class DeviceManager
         $messageContent = new MessageContent(); 
         $messageContent->setDeviceId($this->id);
         $messageContent->setDeviceStatus($this->status->getName());
+        $date = date('Y-m-d');
+        $date = date_create_from_format("Y-m-d", $date);
+        $date->setTime(0,0);
+        $messageContent->setDate($date);
         $messageContent->setStartDate($startDate);
         $messageContent->setEndDate($endDate);
         $messageContent->setTotalUsage($this->calculateTotalPeriodUsage($startDate, $endDate));
