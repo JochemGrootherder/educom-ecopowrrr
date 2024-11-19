@@ -68,6 +68,18 @@ class Customer
     #[ORM\OneToOne(mappedBy: 'Customer', cascade: ['persist', 'remove'])]
     private ?DeviceManager $deviceManager = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $municipality = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $province = null;
+
+    #[ORM\Column(type: Types::DECIMAL, precision: 20, scale: 14, nullable: true)]
+    private ?string $latitude = null;
+
+    #[ORM\Column(type: Types::DECIMAL, precision: 20, scale: 14, nullable: true)]
+    private ?string $longitude = null;
+
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('firstname', new Assert\Length([
@@ -294,6 +306,54 @@ class Customer
         }
 
         $this->deviceManager = $deviceManager;
+
+        return $this;
+    }
+
+    public function getMunicipality(): ?string
+    {
+        return $this->municipality;
+    }
+
+    public function setMunicipality(?string $municipality): static
+    {
+        $this->municipality = $municipality;
+
+        return $this;
+    }
+
+    public function getProvince(): ?string
+    {
+        return $this->province;
+    }
+
+    public function setProvince(?string $province): static
+    {
+        $this->province = $province;
+
+        return $this;
+    }
+
+    public function getLatitude(): ?string
+    {
+        return $this->latitude;
+    }
+
+    public function setLatitude(?string $latitude): static
+    {
+        $this->latitude = $latitude;
+
+        return $this;
+    }
+
+    public function getLongitude(): ?string
+    {
+        return $this->longitude;
+    }
+
+    public function setLongitude(?string $longitude): static
+    {
+        $this->longitude = $longitude;
 
         return $this;
     }

@@ -108,9 +108,24 @@ class DeviceManagerRepository extends ServiceEntityRepository
         dump($data);
         if($data['device_status'] == 'active')
         {
-            $id = $data['device_id'];
             $deviceRep = $this->getEntityManager()->getRepository(Device::class);
             $deviceRep->saveDeviceData($data);
+
+            $totalPeriodYield = 0.0;
+            foreach($data['devices'] as $device)
+            {
+                $totalPeriodYield += $device['device_period_yield'];
+            }
+            $surplusAmount = $totalPeriodYield - $data['total_usage'];
+
+            $surplus = 
+            [
+                "deviceManager" => $this->fetch($data['device_id']),
+                "amount" => $surplusAmount,
+                "date" => $data['end_date']
+            ];
+            $deviceSurplusRep = $this->getEntityManager()->getRepository(DeviceSurplus::class);
+            $deviceSurplusRep->saveDeviceSurplus($surplus);
             return true;
         }
 

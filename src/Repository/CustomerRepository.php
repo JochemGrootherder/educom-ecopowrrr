@@ -62,6 +62,10 @@ class CustomerRepository extends ServiceEntityRepository
         {
             $customer->setCity($addressInfo['city']);
             $customer->setAddress($addressInfo['street']);
+            $customer->setMunicipality($addressInfo['municipality']);
+            $customer->setProvince($addressInfo['province']);
+            $customer->setLatitude($addressInfo['geo']['lat']);
+            $customer->setLongitude($addressInfo['geo']['lon']);
         }
         
         $this->getEntityManager()->persist($customer);

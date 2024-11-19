@@ -118,7 +118,10 @@ class DeviceManager
         $messageContent->setTotalUsage($this->calculateTotalPeriodUsage($startDate, $endDate));
         foreach($this->devices as $device)
         {
-            $messageContent->createMessageDevice($device);
+            if($device->getDeviceStatus()->getName() == "active")
+            {
+                $messageContent->createMessageDevice($device);
+            }
         }
         return json_encode($messageContent, JSON_PRETTY_PRINT);
     }

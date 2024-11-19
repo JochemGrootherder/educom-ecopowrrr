@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20241118131447 extends AbstractMigration
+final class Version20241119095554 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -20,7 +20,7 @@ final class Version20241118131447 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('CREATE TABLE customer (id INT AUTO_INCREMENT NOT NULL, customer_advisor_id INT NOT NULL, zipcode VARCHAR(8) NOT NULL, housenumber INT NOT NULL, firstname VARCHAR(50) DEFAULT NULL, lastname VARCHAR(80) NOT NULL, gender VARCHAR(20) DEFAULT NULL, email VARCHAR(255) NOT NULL, phonenumber VARCHAR(20) DEFAULT NULL, date_of_birth DATE DEFAULT NULL, bank_details VARCHAR(50) NOT NULL, address VARCHAR(100) DEFAULT NULL, city VARCHAR(80) DEFAULT NULL, INDEX IDX_81398E099B1AA9F5 (customer_advisor_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE customer (id INT AUTO_INCREMENT NOT NULL, customer_advisor_id INT NOT NULL, zipcode VARCHAR(8) NOT NULL, housenumber INT NOT NULL, firstname VARCHAR(50) DEFAULT NULL, lastname VARCHAR(80) NOT NULL, gender VARCHAR(20) DEFAULT NULL, email VARCHAR(255) NOT NULL, phonenumber VARCHAR(20) DEFAULT NULL, date_of_birth DATE DEFAULT NULL, bank_details VARCHAR(50) NOT NULL, address VARCHAR(100) DEFAULT NULL, city VARCHAR(80) DEFAULT NULL, municipality VARCHAR(255) DEFAULT NULL, province VARCHAR(255) DEFAULT NULL, latitude NUMERIC(20, 14) DEFAULT NULL, longitude NUMERIC(20, 14) DEFAULT NULL, INDEX IDX_81398E099B1AA9F5 (customer_advisor_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE customer_advisor (id INT AUTO_INCREMENT NOT NULL, username VARCHAR(120) NOT NULL, password VARCHAR(120) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE device (id INT AUTO_INCREMENT NOT NULL, device_manager_id INT NOT NULL, device_type_id INT NOT NULL, device_status_id INT NOT NULL, serial_number VARCHAR(80) NOT NULL, INDEX IDX_92FB68EFF0D77A5 (device_manager_id), INDEX IDX_92FB68E4FFA550E (device_type_id), INDEX IDX_92FB68E5017142C (device_status_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE device_manager (id INT AUTO_INCREMENT NOT NULL, status_id INT NOT NULL, customer_id INT NOT NULL, INDEX IDX_7092FC246BF700BD (status_id), UNIQUE INDEX UNIQ_7092FC249395C3F3 (customer_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
