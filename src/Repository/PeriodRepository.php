@@ -60,30 +60,7 @@ class PeriodRepository extends ServiceEntityRepository
         // Get the current date
         $currentDate = date('y-m-d');
         $date = date_create_from_format("y-m-d", $currentDate);
-        $date->settime(0,0);
-
-        // Find the period with a start date less than or equal to the current date
-        // and an end date greater than or equal to the current date
-        $query = $this->getEntityManager()->createQuery(
-            'SELECT p
-            FROM App\Entity\Period p
-            WHERE :currentDate BETWEEN p.startDate AND p.endDate'
-        )->setParameter('currentDate', $date);
-
-        $result = $query->getResult();
-        $result = $result[0];
-
-        if(empty($result))
-        {
-            $period = 
-            [
-                'startDate' => $date,
-                'endDate' => $date
-            ];
-
-            $result = $this->savePeriod($period);
-        }
-        return $result;
+        return $this->getDatePeriod($date);
     }
 
     public function getCurrentYearPeriods()
@@ -112,14 +89,28 @@ class PeriodRepository extends ServiceEntityRepository
 
     public function getDatePeriod($date)
     {
-        $qb = $this->createQueryBuilder('p')
-        ->where('p.startDate >= :date')
-        ->andWhere('p.endDate <= :date')
-        ->setParameter('date', $date);
+        $date->setTime(0,0);
 
-        $query = $qb->getQuery();
+        $query = $this->getEntityManager()->createQuery(
+            'SELECT p
+            FROM App\Entity\Period p
+            WHERE :dateRequested BETWEEN p.startDate AND p.endDate'
+        )->setParameter('dateRequested', $date);
 
-        return $query->getSingleResult();
+        $result = $query->getResult();
+        if($result)
+        {
+            return $result[0];
+        }
+        
+        $period = 
+        [
+            'startDate' => $date,
+            'endDate' => $date
+        ];
+
+        return $this->savePeriod($period);
+        
     }
 
     

@@ -111,7 +111,9 @@ class DeviceManager
         {
             $surplusDate = $surplus->getDate();
             $surplusDate->setTime(0,0);
-            if($surplusDate >= $startDate && $surplusDate <= $endDate)
+            if($surplusDate >= $startDate
+            && $surplusDate <= $endDate 
+            && $surplus->getPeriod() == null)
             {
                 $periodSurplus += $surplus->getAmount();
             }
@@ -129,19 +131,31 @@ class DeviceManager
             return $totalYield;
         }
 
-    public function getSurplusByDate($date)
-    {
-        $date = $date->format('Y-m-d');
-        foreach($this->surpluses as $surplus)
+        public function getSurplusByDate($date)
         {
-            $surplusDate = $surplus->getDate()->format('Y-m-d');
-            if($surplusDate === $date)
+            $date = $date->format('Y-m-d');
+            foreach($this->surpluses as $surplus)
             {
-                return $surplus;
+                $surplusDate = $surplus->getDate()->format('Y-m-d');
+                if($surplusDate === $date)
+                {
+                    return $surplus;
+                }
             }
+            return null;
         }
-        return null;
-    }
+
+        public function getSurplusByPeriod($period)
+        {
+            foreach($this->surpluses as $surplus)
+            {
+                if($surplus->getPeriod() === $period)
+                {
+                    return $surplus;
+                }
+            }
+            return null;
+        }
 
     public function createMessage($startDate, $endDate)
     {

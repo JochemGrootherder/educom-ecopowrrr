@@ -25,6 +25,9 @@ class DeviceYield
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $date = null;
 
+    #[ORM\ManyToOne(inversedBy: 'deviceYields')]
+    private ?Period $Period = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -62,6 +65,18 @@ class DeviceYield
     public function setDate(\DateTimeInterface $date): static
     {
         $this->date = $date;
+
+        return $this;
+    }
+
+    public function getPeriod(): ?Period
+    {
+        return $this->Period;
+    }
+
+    public function setPeriod(?Period $Period): static
+    {
+        $this->Period = $Period;
 
         return $this;
     }

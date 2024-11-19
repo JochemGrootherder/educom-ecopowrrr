@@ -89,7 +89,8 @@ class Device
             $startDate->setTime(0,0);
             $endDate->setTime(0,0);
             if($yieldDate >= $startDate
-            && $yieldDate <= $endDate)
+            && $yieldDate <= $endDate
+            && $yield->getPeriod() == null)
             {
                 $totalYield += $yield->getAmount();
             }
@@ -104,6 +105,18 @@ class Device
         {
             $yieldDate = $yield->getDate()->format('Y-m-d');
             if($yieldDate === $date)
+            {
+                return $yield;
+            }
+        }
+        return null;
+    }
+
+    public function getYieldByPeriod($period)
+    {
+        foreach($this->deviceYields as $yield)
+        {
+            if($yield->getPeriod() === $period)
             {
                 return $yield;
             }

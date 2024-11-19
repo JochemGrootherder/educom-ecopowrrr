@@ -21,6 +21,7 @@ class DeviceYieldRepository extends ServiceEntityRepository
 
     public function saveDeviceYield($params)
     {
+        $periodRep = $this->getEntityManager()->getRepository(Period::class);
         if(!empty($params['device_id']))
         {
             $deviceRep = $this->getEntityManager()->getRepository(Device::class);
@@ -33,24 +34,33 @@ class DeviceYieldRepository extends ServiceEntityRepository
         if(!empty($params['date']))
         {
             $date = $params['date'];
-            $date = date_create_from_format("Y-m-d", $date);
         }
         else
         {
-            $currentDate = date('Y-m-d');
-            $date = date_create_from_format("Y-m-d", $currentDate);
+            $date = date('Y-m-d');
         }
-        
+        $date = date_create_from_format("Y-m-d", $date);
         $date->settime(0,0);
+        
+        $period = null;
+        if(!empty($params['period']))
+        {
+            $period = $params['period'];
+            $deviceYield = $device->getYieldByPeriod($period);
+        }
+        else{
+            $deviceYield = $device->getYieldByDate($date);
+        }
+
         $amount = $params['amount'];
         //$deviceYield = $this->fetchByDeviceAndPeriod($device, $period);
-        $deviceYield = $device->getYieldByDate($date);
         
-        if(empty($deviceYield))
+        if(!$deviceYield)
         {
             $deviceYield = new DeviceYield();
             $deviceYield->setDevice($device);
             $deviceYield->setDate($date);
+            $deviceYield->setPeriod($period);
         }
         $deviceYield->setAmount($amount);
 

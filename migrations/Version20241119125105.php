@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20241119095554 extends AbstractMigration
+final class Version20241119125105 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -25,9 +25,9 @@ final class Version20241119095554 extends AbstractMigration
         $this->addSql('CREATE TABLE device (id INT AUTO_INCREMENT NOT NULL, device_manager_id INT NOT NULL, device_type_id INT NOT NULL, device_status_id INT NOT NULL, serial_number VARCHAR(80) NOT NULL, INDEX IDX_92FB68EFF0D77A5 (device_manager_id), INDEX IDX_92FB68E4FFA550E (device_type_id), INDEX IDX_92FB68E5017142C (device_status_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE device_manager (id INT AUTO_INCREMENT NOT NULL, status_id INT NOT NULL, customer_id INT NOT NULL, INDEX IDX_7092FC246BF700BD (status_id), UNIQUE INDEX UNIQ_7092FC249395C3F3 (customer_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE device_status (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(50) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE device_surplus (id INT AUTO_INCREMENT NOT NULL, device_manager_id INT NOT NULL, amount NUMERIC(10, 2) NOT NULL, date DATE NOT NULL, INDEX IDX_A311DC65FF0D77A5 (device_manager_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE device_surplus (id INT AUTO_INCREMENT NOT NULL, device_manager_id INT NOT NULL, period_id INT DEFAULT NULL, amount NUMERIC(10, 2) NOT NULL, date DATE NOT NULL, INDEX IDX_A311DC65FF0D77A5 (device_manager_id), INDEX IDX_A311DC65EC8B7ADE (period_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE device_type (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(50) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE device_yield (id INT AUTO_INCREMENT NOT NULL, device_id INT NOT NULL, amount NUMERIC(10, 2) NOT NULL, date DATE NOT NULL, INDEX IDX_7FC0A56C94A4C7D4 (device_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE device_yield (id INT AUTO_INCREMENT NOT NULL, device_id INT NOT NULL, period_id INT DEFAULT NULL, amount NUMERIC(10, 2) NOT NULL, date DATE NOT NULL, INDEX IDX_7FC0A56C94A4C7D4 (device_id), INDEX IDX_7FC0A56CEC8B7ADE (period_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE message (id INT AUTO_INCREMENT NOT NULL, device_manager_id INT NOT NULL, date DATE NOT NULL, message MEDIUMTEXT NOT NULL, INDEX IDX_B6BD307FFF0D77A5 (device_manager_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE period (id INT AUTO_INCREMENT NOT NULL, start_date DATE NOT NULL, end_date DATE NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE price (id INT AUTO_INCREMENT NOT NULL, customer_id INT NOT NULL, price NUMERIC(8, 2) NOT NULL, date DATE NOT NULL, INDEX IDX_CAC822D99395C3F3 (customer_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
@@ -39,7 +39,9 @@ final class Version20241119095554 extends AbstractMigration
         $this->addSql('ALTER TABLE device_manager ADD CONSTRAINT FK_7092FC246BF700BD FOREIGN KEY (status_id) REFERENCES device_status (id)');
         $this->addSql('ALTER TABLE device_manager ADD CONSTRAINT FK_7092FC249395C3F3 FOREIGN KEY (customer_id) REFERENCES customer (id)');
         $this->addSql('ALTER TABLE device_surplus ADD CONSTRAINT FK_A311DC65FF0D77A5 FOREIGN KEY (device_manager_id) REFERENCES device_manager (id)');
+        $this->addSql('ALTER TABLE device_surplus ADD CONSTRAINT FK_A311DC65EC8B7ADE FOREIGN KEY (period_id) REFERENCES period (id)');
         $this->addSql('ALTER TABLE device_yield ADD CONSTRAINT FK_7FC0A56C94A4C7D4 FOREIGN KEY (device_id) REFERENCES device (id)');
+        $this->addSql('ALTER TABLE device_yield ADD CONSTRAINT FK_7FC0A56CEC8B7ADE FOREIGN KEY (period_id) REFERENCES period (id)');
         $this->addSql('ALTER TABLE message ADD CONSTRAINT FK_B6BD307FFF0D77A5 FOREIGN KEY (device_manager_id) REFERENCES device_manager (id)');
         $this->addSql('ALTER TABLE price ADD CONSTRAINT FK_CAC822D99395C3F3 FOREIGN KEY (customer_id) REFERENCES customer (id)');
     }
@@ -54,7 +56,9 @@ final class Version20241119095554 extends AbstractMigration
         $this->addSql('ALTER TABLE device_manager DROP FOREIGN KEY FK_7092FC246BF700BD');
         $this->addSql('ALTER TABLE device_manager DROP FOREIGN KEY FK_7092FC249395C3F3');
         $this->addSql('ALTER TABLE device_surplus DROP FOREIGN KEY FK_A311DC65FF0D77A5');
+        $this->addSql('ALTER TABLE device_surplus DROP FOREIGN KEY FK_A311DC65EC8B7ADE');
         $this->addSql('ALTER TABLE device_yield DROP FOREIGN KEY FK_7FC0A56C94A4C7D4');
+        $this->addSql('ALTER TABLE device_yield DROP FOREIGN KEY FK_7FC0A56CEC8B7ADE');
         $this->addSql('ALTER TABLE message DROP FOREIGN KEY FK_B6BD307FFF0D77A5');
         $this->addSql('ALTER TABLE price DROP FOREIGN KEY FK_CAC822D99395C3F3');
         $this->addSql('DROP TABLE customer');

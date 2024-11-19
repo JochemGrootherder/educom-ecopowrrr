@@ -25,6 +25,9 @@ class DeviceSurplus
     #[ORM\JoinColumn(nullable: false)]
     private ?DeviceManager $DeviceManager = null;
 
+    #[ORM\ManyToOne(inversedBy: 'deviceSurpluses')]
+    private ?Period $Period = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -62,6 +65,18 @@ class DeviceSurplus
     public function setDeviceManager(?DeviceManager $DeviceManager): static
     {
         $this->DeviceManager = $DeviceManager;
+
+        return $this;
+    }
+
+    public function getPeriod(): ?Period
+    {
+        return $this->Period;
+    }
+
+    public function setPeriod(?Period $Period): static
+    {
+        $this->Period = $Period;
 
         return $this;
     }

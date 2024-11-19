@@ -12,6 +12,7 @@ use App\Entity\DeviceStatus;
 use App\Entity\Device;
 use App\Entity\DeviceSurplus;
 use App\Entity\Customer;
+use App\Entity\Period;
 
 
 /**
@@ -76,6 +77,8 @@ class DeviceManagerRepository extends ServiceEntityRepository
 
     public function storeMessageData($data)
     {
+        $periodRep = $this->getEntityManager()->getRepository(Period::class);
+        $date = date_create_from_format("Y-m-d", $data['date']);
         dump($data);
         if($data['device_status'] == 'active')
         {
@@ -92,6 +95,7 @@ class DeviceManagerRepository extends ServiceEntityRepository
             $surplus = 
             [
                 "deviceManager" => $this->fetch($data['device_id']),
+                "period" => $periodRep->getDatePeriod($date),
                 "amount" => $surplusAmount,
                 "date" => $data['date']
             ];
