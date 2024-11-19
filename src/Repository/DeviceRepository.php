@@ -10,7 +10,6 @@ use App\Entity\DeviceManager;
 use App\Entity\DeviceStatus;
 use App\Entity\DeviceType;
 use App\Entity\DeviceYield;
-use App\Entity\DeviceSurplus;
 
 /**
  * @extends ServiceEntityRepository<Device>
@@ -95,6 +94,38 @@ class DeviceRepository extends ServiceEntityRepository
             return true;
         }
         return false;
+    }
+
+    public function saveDeviceData($data)
+    {
+        $deviceManagerId = $data['device_id'];
+        $deviceManagerRep = $this->getEntityManager()->getRepository(DeviceManager::class);
+        $deviceManager = $deviceManagerRep->fetch($deviceManagerId);
+        foreach($data['devices'] as $deviceData)
+        {
+            $serialNumber = $deviceData['serial_number'];
+            $device = $this->findOneBy([
+                "serialNumber" => $serialNumber,
+                "DeviceManager" => $deviceManager
+            ]);
+            if(!$device)
+            {
+                $params = [
+                    'device_status' => $deviceData['device_status'],
+                    'device_type' => $deviceData['device_type'],
+                    'device_manager_id' => $deviceManagerId,
+                    'serial_number' => $serialNumber
+                ];
+                $device = $this->saveDevice($params);
+            }
+            $deviceYieldRep = $this->getEntityManager()->getRepository(DeviceYield::class);
+            $deviceYieldParams = [
+                "device" => $device,
+                "date" => $data['end_date'],
+                "amount" => $deviceData['device_period_yield']
+            ];
+            $deviceYieldRep->saveDeviceYield($deviceYieldParams);
+        }
     }
 
     //    /**

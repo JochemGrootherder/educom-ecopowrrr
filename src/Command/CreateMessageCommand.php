@@ -50,10 +50,6 @@ class CreateMessageCommand extends Command
         $message = $deviceManager->createMessage($startDate, $endDate);
         $response = $this->sendMessage($message);
 
-
-        /*$messageRep = $this->doctrine->getRepository(Message::class);
-        $message = $messageRep->createMessage($deviceManager);*/
-
         $io->success('Message created successfully');
         $io->info($response);
 

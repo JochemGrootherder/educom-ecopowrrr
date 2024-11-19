@@ -52,7 +52,7 @@ class DeviceYieldRepository extends ServiceEntityRepository
             $deviceYield->setDevice($device);
             $deviceYield->setDate($date);
         }
-        $deviceYield->setAmount($deviceYield->getAmount() + $amount);
+        $deviceYield->setAmount($amount);
 
         $device->addDeviceYield($deviceYield);
 

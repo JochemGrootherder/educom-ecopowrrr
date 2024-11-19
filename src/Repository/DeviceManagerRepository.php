@@ -103,6 +103,21 @@ class DeviceManagerRepository extends ServiceEntityRepository
         return false;
     }
 
+    public function storeMessageData($data)
+    {
+        dump($data);
+        if($data['device_status'] == 'active')
+        {
+            $id = $data['device_id'];
+            $deviceRep = $this->getEntityManager()->getRepository(Device::class);
+            $deviceRep->saveDeviceData($data);
+            return true;
+        }
+
+        dump("device manager is inactive");
+        return false;
+    }
+
 //    /**
 //     * @return DeviceManager[] Returns an array of DeviceManager objects
 //     */
