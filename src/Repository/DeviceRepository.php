@@ -7,6 +7,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 use App\Entity\DeviceManager;
+use App\Entity\Period;
 use App\Entity\DeviceStatus;
 use App\Entity\DeviceType;
 use App\Entity\DeviceYield;
@@ -79,9 +80,14 @@ class DeviceRepository extends ServiceEntityRepository
 
     public function saveDeviceData($data)
     {
+        $periodRep = $this->getEntityManager()->getRepository(Period::class);
         $deviceManagerId = $data['device_id'];
         $deviceManagerRep = $this->getEntityManager()->getRepository(DeviceManager::class);
         $deviceManager = $deviceManagerRep->fetch($deviceManagerId);
+
+        $date = date_create_from_format('Y-m-d', $data['date']);
+        $period = $periodRep->getDatePeriod($date);
+
         foreach($data['devices'] as $deviceData)
         {
             $serialNumber = $deviceData['serial_number'];
@@ -102,8 +108,8 @@ class DeviceRepository extends ServiceEntityRepository
             $deviceYieldRep = $this->getEntityManager()->getRepository(DeviceYield::class);
             $deviceYieldParams = [
                 "device" => $device,
-                "date" => $data['date'],
-                "amount" => $deviceData['device_period_yield']
+                "amount" => $deviceData['device_period_yield'],
+                "period" => $period
             ];
             $deviceYieldRep->saveDeviceYield($deviceYieldParams);
         }

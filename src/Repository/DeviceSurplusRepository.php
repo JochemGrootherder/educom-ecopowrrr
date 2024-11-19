@@ -31,36 +31,14 @@ class DeviceSurplusRepository extends ServiceEntityRepository
         {
             $deviceManager = $params['deviceManager'];
         }
-        if(!empty($params['date']))
-        {
-            $date = $params['date'];
-        }
-        else
-        {
-            $date = date('Y-m-d');
-        }
-        $date = date_create_from_format("Y-m-d", $date);
-        $date->settime(0,0);
-
-        
-        $period = null;
-        if(!empty($params['period']))
-        {
-            $period = $params['period'];
-            $deviceSurplus = $deviceManager->getSurplusByPeriod($period);
-        }
-        else
-        {
-            $deviceSurplus = $deviceManager->getSurplusByDate($date);
-        }
-        
+        $period = $params['period'];
+        $deviceSurplus = $deviceManager->getSurplusByPeriod($period);
 
         $amount = $params['amount'];
         if(empty($deviceSurplus))
         {
             $deviceSurplus = new DeviceSurplus();
             $deviceSurplus->setDeviceManager($deviceManager);
-            $deviceSurplus->setDate($date);
             $deviceSurplus->setPeriod($period);
         }
         $deviceSurplus->setAmount($amount);

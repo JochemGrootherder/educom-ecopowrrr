@@ -31,35 +31,16 @@ class DeviceYieldRepository extends ServiceEntityRepository
         {
             $device = $params['device'];
         }
-        if(!empty($params['date']))
-        {
-            $date = $params['date'];
-        }
-        else
-        {
-            $date = date('Y-m-d');
-        }
-        $date = date_create_from_format("Y-m-d", $date);
-        $date->settime(0,0);
         
-        $period = null;
-        if(!empty($params['period']))
-        {
-            $period = $params['period'];
-            $deviceYield = $device->getYieldByPeriod($period);
-        }
-        else{
-            $deviceYield = $device->getYieldByDate($date);
-        }
-
+        $period = $params['period'];
+        
         $amount = $params['amount'];
-        //$deviceYield = $this->fetchByDeviceAndPeriod($device, $period);
+        $deviceYield = $this->fetchByDeviceAndPeriod($device, $period);
         
         if(!$deviceYield)
         {
             $deviceYield = new DeviceYield();
             $deviceYield->setDevice($device);
-            $deviceYield->setDate($date);
             $deviceYield->setPeriod($period);
         }
         $deviceYield->setAmount($amount);

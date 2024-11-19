@@ -96,8 +96,7 @@ class DeviceManagerRepository extends ServiceEntityRepository
             [
                 "deviceManager" => $this->fetch($data['device_id']),
                 "period" => $periodRep->getDatePeriod($date),
-                "amount" => $surplusAmount,
-                "date" => $data['date']
+                "amount" => $surplusAmount
             ];
             $deviceSurplusRep = $this->getEntityManager()->getRepository(DeviceSurplus::class);
             $deviceSurplusRep->saveDeviceSurplus($surplus);

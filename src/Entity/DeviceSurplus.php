@@ -18,9 +18,6 @@ class DeviceSurplus
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     private ?string $amount = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $date = null;
-
     #[ORM\ManyToOne(inversedBy: 'surpluses')]
     #[ORM\JoinColumn(nullable: false)]
     private ?DeviceManager $DeviceManager = null;
@@ -41,18 +38,6 @@ class DeviceSurplus
     public function setAmount(string $amount): static
     {
         $this->amount = $amount;
-
-        return $this;
-    }
-
-    public function getDate(): ?\DateTimeInterface
-    {
-        return $this->date;
-    }
-
-    public function setDate(\DateTimeInterface $date): static
-    {
-        $this->date = $date;
 
         return $this;
     }

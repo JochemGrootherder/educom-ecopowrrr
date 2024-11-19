@@ -52,17 +52,6 @@ class Device
         $date = date_create_from_format("Y-m-d", $date);
         $date->setTime(0,0);
         
-        $deviceYield = $this->getYieldByDate($date);
-
-        if(!$deviceYield)
-        {
-            $deviceYield = new DeviceYield();
-            $deviceYield->setDevice($this);
-            $deviceYield->setDate($date);
-            $this->addDeviceYield($deviceYield);
-        }
-        $deviceYield->setAmount($value);
-        
         $params = [
             "yield" => $value,
             "date" => $date->format('Y-m-d'),
@@ -148,27 +137,12 @@ class Device
             $startDate->setTime(0,0);
             $endDate->setTime(0,0);
             if($yieldDate >= $startDate
-            && $yieldDate <= $endDate
-            && $yield->getPeriod() == null)
+            && $yieldDate <= $endDate)
             {
                 $totalYield += $yield->getAmount();
             }
         }
         return $totalYield;
-    }
-
-    public function getYieldByDate($date)
-    {
-        $date = $date->format('Y-m-d');
-        foreach($this->deviceYields as $yield)
-        {
-            $yieldDate = $yield->getDate()->format('Y-m-d');
-            if($yieldDate === $date)
-            {
-                return $yield;
-            }
-        }
-        return null;
     }
 
     public function getYieldByPeriod($period)
