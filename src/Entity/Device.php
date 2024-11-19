@@ -62,7 +62,66 @@ class Device
             $this->addDeviceYield($deviceYield);
         }
         $deviceYield->setAmount($value);
-        dump($this->id, $value);
+        
+        $params = [
+            "yield" => $value,
+            "date" => $date->format('Y-m-d'),
+        ];
+        $this->saveLocalData($params);
+    }
+
+    private function saveLocalData($params)
+    {
+        $text = json_encode($params);
+        $file = __DIR__.'/../../public/DeviceData/'. $this->id . '.txt';
+        //write data to local file
+        $myFile = fopen($file, "a");
+        fwrite($myFile, $text);
+        fwrite($myFile, "\n");
+
+        fclose($myFile);
+
+    }
+
+    private function getLocalData()
+    {
+        $file = __DIR__.'/../../public/DeviceData/'. $this->id . '.txt';
+        $myFile = fopen($file, "r");
+        
+        $data = [];
+        while(($line = fgets($myFile)) !== false)
+        {
+            $data[] = json_decode($line, true);
+        }
+        fclose($myFile);
+        return $data;
+    }
+
+    public function getLocalPeriodYield($startDate, $endDate)
+    {
+        $data = $this->getLocalData();
+        $startDate->setTime(0,0);
+        $endDate->setTime(0,0);
+        $totalYield = 0.0;
+        foreach($data as $yield)
+        {
+            $yieldDate = date_create_from_format("Y-m-d", $yield['date']);
+            $yieldDate->setTime(0,0);
+            if($yieldDate >= $startDate
+            && $yieldDate <= $endDate)
+            {
+                $totalYield += $yield['yield'];
+            }
+        }
+        return $totalYield;
+
+    }
+
+    public function getLocalYieldUntillDate($date)
+    {
+        $startDate = "1970-01-01";
+        $startDate = date_create_from_format("Y-m-d", $startDate);
+        return $this->getLocalPeriodYield($startDate, $date);
     }
     
     public function getYieldUntillDate($date)

@@ -42,8 +42,8 @@ class MessageContent implements \JsonSerializable
         $messageDevice->setSerialNumber($device->getSerialNumber());
         $messageDevice->setDeviceStatus($device->getDeviceStatus()->getName());
         $messageDevice->setDeviceType($device->getDeviceType()->getName());
-        $messageDevice->setDeviceTotalYield($device->getYieldUntillDate($this->endDate));
-        $messageDevice->setDevicePeriodYield($device->getPeriodYield($this->startDate, $this->endDate));
+        $messageDevice->setDeviceTotalYield($device->getLocalYieldUntillDate($this->endDate));
+        $messageDevice->setDevicePeriodYield($device->getLocalPeriodYield($this->startDate, $this->endDate));
 
         $this->devices[] = $messageDevice;
     }

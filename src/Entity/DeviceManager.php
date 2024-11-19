@@ -63,27 +63,65 @@ class DeviceManager
             }
         }
 
-        $currentDate = date('Y-m-d');
-        $currentDate = date_create_from_format("Y-m-d", $currentDate);
-        $currentDate->settime(0,0);
+        $date = date('Y-m-d');
+        $date = date_create_from_format("Y-m-d", $date);
+        $date->settime(0,0);
         
-        $periodYield = $this->getPeriodYield($currentDate, $currentDate);
-        $randValue = rand(0, ($periodYield * 2));
+        $periodYield = $this->getLocalPeriodYield($date, $date);
+        $value = rand(0, ($periodYield * 2));
         
-        $surplus = $this->getSurplusByDate($currentDate);
-        //if the surplus doesn't exist, create it
-        if(!$surplus)
+        $params = [
+            "surplus" => $value,
+            "date" => $date->format('Y-m-d'),
+        ];
+        $this->saveLocalData($params);
+    }
+
+    private function saveLocalData($params)
+    {
+        $text = json_encode($params);
+        $file = __DIR__.'/../../public/DeviceManagerData/'. $this->id . '.txt';
+        //write data to local file
+        $myFile = fopen($file, "a");
+        fwrite($myFile, $text);
+        fwrite($myFile, "\n");
+
+        fclose($myFile);
+
+    }
+
+    private function getLocalData()
+    {
+        $file = __DIR__.'/../../public/DeviceManagerData/'. $this->id . '.txt';
+        $myFile = fopen($file, "r");
+        
+        $data = [];
+        while(($line = fgets($myFile)) !== false)
         {
-            $surplus = new DeviceSurplus();
-            $surplus->setDeviceManager($this);
-            $surplus->setAmount(0.0);
-            $surplus->setDate($currentDate);
-            $this->addSurplus($surplus);
+            $data[] = json_decode($line, true);
         }
-        $surplusAmount = $surplus->getAmount();
-        $value = $surplus->getAmount() + $randValue;        
-        $surplus->setAmount($value);
-        dump($this->id, $randValue, $value, $surplusAmount);
+        fclose($myFile);
+        return $data;
+    }
+
+    private function getLocalPeriodSurplus($startDate, $endDate)
+    {
+        $data = $this->getLocalData();
+        $totalSurplus = 0.0;
+        $startDate->setTime(0,0);
+        $endDate->setTime(0,0);
+        foreach($data as $surplus)
+        {
+            $surplusDate = date_create_from_format("Y-m-d", $surplus['date']);
+            $surplusDate->setTime(0,0);
+            if($surplusDate >= $startDate
+            && $surplusDate <= $endDate)
+            {
+                $totalSurplus += $surplus['surplus'];
+            }
+        }
+        return $totalSurplus;
+
     }
 
     public function getSurplusUntillPeriod($period)
@@ -121,12 +159,15 @@ class DeviceManager
         return $periodSurplus;
     }
     
-        public function getPeriodYield($startDate, $endDate)
+        public function getLocalPeriodYield($startDate, $endDate)
         {
             $totalYield = 0.0;
             foreach($this->devices as $device)
             {
-                $totalYield += $device->getPeriodYield($startDate, $endDate);
+                if($device->getDeviceStatus()->getName() == "active")
+                {
+                    $totalYield += $device->getLocalPeriodYield($startDate, $endDate);
+                }
             }
             return $totalYield;
         }
@@ -181,8 +222,8 @@ class DeviceManager
 
     private function calculateTotalPeriodUsage($startDate, $endDate)
     {
-        $totalSurplus = $this->getPeriodSurplus($startDate, $endDate);        
-        $totalYield = $this->getPeriodYield($startDate, $endDate);
+        $totalSurplus = $this->getLocalPeriodSurplus($startDate, $endDate);        
+        $totalYield = $this->getLocalPeriodYield($startDate, $endDate);
 
         return $totalYield - $totalSurplus;
     }
