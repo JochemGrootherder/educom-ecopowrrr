@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\DeviceManagerRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -14,11 +15,13 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 use App\Message\MessageContent;
 
 #[ORM\Entity(repositoryClass: DeviceManagerRepository::class)]
+#[ApiResource]
 class DeviceManager
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Assert\Uuid]
     private ?int $id = null;
 
     #[ORM\ManyToOne]
@@ -68,7 +71,7 @@ class DeviceManager
         $date->settime(0,0);
         
         $periodYield = $this->getLocalPeriodYield($date, $date);
-        $value = rand(0, ($periodYield * 2));
+        $value = rand(0, ($periodYield * 1.1));
         
         $params = [
             "surplus" => $value,
